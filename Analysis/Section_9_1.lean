@@ -53,10 +53,13 @@ example {a b: EReal} (h: a ≥ b) : Set.Ioc a b = ∅ := by
 example {a b: EReal} (h: a ≥ b) : Set.Ioo a b = ∅ := by
   sorry
 
-example {a b: EReal} (h: a = b) : Set.Icc a a = {a} := by
+example {a b: EReal} (h: a = b) : Set.Icc a b = {a} := by
   sorry
 
-/-- Definition 9.1.5.  Note that a slightly different `Real.adherent` was defined in Chapter 6.4 -/
+/--
+Definition 9.1.5.  Note that a slightly different {name}`Real.Adherent` was defined in
+Chapter 6.4
+-/
 abbrev Real.adherent' (ε:ℝ) (x:ℝ) (X: Set ℝ) := ∃ y ∈ X, |x - y| ≤ ε
 
 /-- Example 9.1.7 -/
@@ -69,14 +72,14 @@ example : (0.5:ℝ).adherent' 1.1 {1,2,3} := by sorry
 
 namespace Chapter9
 
-/-- Definition 9.1.-/
+/-- Definition 9.1.8 (Adherent points). -/
 abbrev AdherentPt (x:ℝ) (X:Set ℝ) := ∀ ε > (0:ℝ), ε.adherent' x X
 
 example : AdherentPt 1 (.Ioo 0 1) := by sorry
 
 example : ¬ AdherentPt 2 (.Ioo 0 1) := by sorry
 
-/-- Definition 9.1.10 (Closure).  Here we identify this definition with the Mathilb version. -/
+/-- Definition 9.1.10 (Closure).  Here we identify this definition with the Mathlib version. -/
 theorem closure_def (X:Set ℝ) : closure X = { x | AdherentPt x X } := by
   ext; simp [Real.mem_closure_iff, AdherentPt, Real.adherent']
   constructor <;> intro h ε hε
@@ -89,19 +92,19 @@ theorem closure_def' (X:Set ℝ) (x :ℝ) : x ∈ closure X ↔ AdherentPt x X :
 theorem AdherentPt_def (x:ℝ) (X:Set ℝ) : AdherentPt x X = ClusterPt x (.principal X) := by
   rw [←closure_def', mem_closure_iff_clusterPt]
 
-/-- Lemma 9.1.11 / Exercise 9.1.2 -/
+/-- Lemma 9.1.11 / Exercise 9.1.1 (subset) -/
 theorem subset_closure (X:Set ℝ): X ⊆ closure X := by sorry
 
-/-- Lemma 9.1.11 / Exercise 9.1.2 -/
+/-- Lemma 9.1.11 / Exercise 9.1.1 (union) -/
 theorem closure_union (X Y:Set ℝ): closure (X ∪ Y) = closure X ∪ closure Y := by sorry
 
-/-- Lemma 9.1.11 / Exercise 9.1.2 -/
+/-- Lemma 9.1.11 / Exercise 9.1.1 (inter) -/
 theorem closure_inter (X Y:Set ℝ): closure (X ∩ Y) ⊆ closure X ∩ closure Y := by sorry
 
-/-- Lemma 9.1.11 / Exercise 9.1.2 -/
+/-- Lemma 9.1.11 / Exercise 9.1.1 (monotonicity) -/
 theorem closure_subset {X Y:Set ℝ} (h: X ⊆ Y): closure X ⊆ closure Y := by sorry
 
-/-- Exercise 9.1.1 -/
+/-- Lemma 9.1.11 / Exercise 9.1.1 (sandwich) -/
 theorem closure_of_subset_closure {X Y:Set ℝ} (h: X ⊆ Y) (h' : Y ⊆ closure X): closure Y = closure X := by sorry
 
 /-- Lemma 9.1.12 -/
@@ -146,22 +149,22 @@ theorem closure_of_Iic {a:ℝ} : closure (.Iic a) = .Iic a := by
 
 theorem closure_of_R : closure (.univ: Set ℝ) = .univ := by sorry
 
-/-- Lemma 9.1.13 / Exercise 9.1.3 -/
+/-- Lemma 9.1.13 / Exercise 9.1.2 (N) -/
 theorem closure_of_N :
   closure ((fun n:ℕ ↦ (n:ℝ)) '' .univ) = ((fun n:ℕ ↦ (n:ℝ)) '' .univ) := by
     sorry
 
-/-- Lemma 9.1.13 / Exercise 9.1.3 -/
+/-- Lemma 9.1.13 / Exercise 9.1.2 (Z) -/
 theorem closure_of_Z :
   closure ((fun n:ℤ ↦ (n:ℝ)) '' .univ) = ((fun n:ℤ ↦ (n:ℝ)) '' .univ) := by
     sorry
 
-/-- Lemma 9.1.13 / Exercise 9.1.3 -/
+/-- Lemma 9.1.13 / Exercise 9.1.2 (Q) -/
 theorem closure_of_Q :
   closure ((fun n:ℚ ↦ (n:ℝ)) '' .univ) = .univ := by
     sorry
 
-/-- Lemma 9.1.14 / Exercise 9.1.5 -/
+/-- Lemma 9.1.14 / Exercise 9.1.4 -/
 theorem limit_of_AdherentPt (X: Set ℝ) (x:ℝ) :
   AdherentPt x X ↔ ∃ a : ℕ → ℝ, (∀ n, a n ∈ X) ∧ Filter.atTop.Tendsto a (nhds x) := by
     sorry
@@ -176,40 +179,40 @@ theorem isClosed_def (X:Set ℝ): IsClosed X ↔ closure X = X :=
 theorem isClosed_def' (X:Set ℝ): IsClosed X ↔ ∀ x, AdherentPt x X → x ∈ X := by
   simp [isClosed_def, subset_antisymm_iff, subset_closure]; simp [closure_def]; rfl
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Icc) -/
 theorem Icc_closed {a b:ℝ} : IsClosed (.Icc a b) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Ici) -/
 theorem Ici_closed (a:ℝ) : IsClosed (.Ici a) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Iic) -/
 theorem Iic_closed (a:ℝ) : IsClosed (.Iic a) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (R) -/
 theorem R_closed : IsClosed (.univ : Set ℝ) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Ico) -/
 theorem Ico_not_closed {a b:ℝ} (h: a < b) : ¬ IsClosed (.Ico a b) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Ioc) -/
 theorem Ioc_not_closed {a b:ℝ} (h: a < b) : ¬ IsClosed (.Ioc a b) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Ioo) -/
 theorem Ioo_not_closed {a b:ℝ} (h: a < b) : ¬ IsClosed (.Ioo a b) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Ioi) -/
 theorem Ioi_not_closed (a:ℝ) : ¬ IsClosed (.Ioi a) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Iio) -/
 theorem Iio_not_closed (a:ℝ) : ¬ IsClosed (.Iio a) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (N) -/
 theorem N_closed : IsClosed ((fun n:ℕ ↦ (n:ℝ)) '' .univ) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Z) -/
 theorem Z_closed : IsClosed ((fun n:ℤ ↦ (n:ℝ)) '' .univ) := by sorry
 
-/-- Examples 9.1.16 -/
+/-- Examples 9.1.16 (Q) -/
 theorem Q_not_closed : ¬ IsClosed ((fun n:ℚ ↦ (n:ℝ)) '' .univ) := by sorry
 
 /-- Corollary 9.1.17 -/
@@ -223,11 +226,11 @@ theorem isClosed_iff_limits_mem (X: Set ℝ) :
 /-- Definition 9.1.18 (Limit points) -/
 abbrev LimitPt (x:ℝ) (X: Set ℝ) := AdherentPt x (X \ {x})
 
-/-- Identification with Mathlib's {name}`AccPt`-/
+/-- Identification with Mathlib's {name}`AccPt` -/
 theorem LimitPt.iff_AccPt (x:ℝ) (X: Set ℝ) : LimitPt x X ↔ AccPt x (.principal X) := by
   rw [accPt_principal_iff_clusterPt,←AdherentPt_def]
 
-/-- Definition 9.1.18 (Isolated points) -/
+/-- Definition 9.1.19 (Isolated points). -/
 abbrev IsolatedPt (x:ℝ) (X: Set ℝ) := x ∈ X ∧ ∃ ε>0, ∀ y ∈ X \ {x}, |x-y| > ε
 
 /-- Example 9.1.19 -/
@@ -287,7 +290,7 @@ theorem mem_Iio_isLimit {a x:ℝ} (hx: x ∈ Set.Iio a) : LimitPt x (.Iio a) := 
 theorem mem_R_isLimit {x:ℝ} : LimitPt x (.univ) := by
   sorry
 
-/-- Definition 9.1.22.  We use here Mathlib's {name}`Bornology.IsBounded`-/
+/-- Definition 9.1.22.  We use here Mathlib's {name}`Bornology.IsBounded` -/
 
 theorem isBounded_def (X: Set ℝ) : Bornology.IsBounded X ↔ ∃ M > 0, X ⊆ .Icc (-M) M := by
   simp [isBounded_iff_forall_norm_le]
@@ -297,36 +300,36 @@ theorem isBounded_def (X: Set ℝ) : Bornology.IsBounded X ↔ ∃ M > 0, X ⊆ 
     peel hC with x hx hC; rw [abs_le'] at hC; simp [hC.1]; linarith [le_max_left C 1]
   intro ⟨ M, hM, hXM ⟩; use M; intro x hx; specialize hXM hx; simp_all [abs_le']; linarith [hXM.1]
 
-/-- Example 9.1.23 -/
+/-- Example 9.1.23 (Icc) -/
 theorem Icc_bounded (a b:ℝ) : Bornology.IsBounded (.Icc a b) := by sorry
 
-/-- Example 9.1.23 -/
+/-- Example 9.1.23 (Ici) -/
 theorem Ici_unbounded (a: ℝ) : ¬ Bornology.IsBounded (.Ici a) := by sorry
 
-/-- Example 9.1.23 -/
-theorem N_unbounded (a: ℝ) : ¬ Bornology.IsBounded ((fun n:ℕ ↦ (n:ℝ)) '' .univ) := by sorry
+/-- Example 9.1.23 (N) -/
+theorem N_unbounded : ¬ Bornology.IsBounded ((fun n:ℕ ↦ (n:ℝ)) '' .univ) := by sorry
 
-/-- Example 9.1.23 -/
-theorem Z_unbounded (a: ℝ) : ¬ Bornology.IsBounded ((fun n:ℤ ↦ (n:ℝ)) '' .univ) := by sorry
+/-- Example 9.1.23 (Z) -/
+theorem Z_unbounded : ¬ Bornology.IsBounded ((fun n:ℤ ↦ (n:ℝ)) '' .univ) := by sorry
 
-/-- Example 9.1.23 -/
-theorem Q_unbounded (a: ℝ) : ¬ Bornology.IsBounded ((fun n:ℚ ↦ (n:ℝ)) '' .univ) := by sorry
+/-- Example 9.1.23 (Q) -/
+theorem Q_unbounded : ¬ Bornology.IsBounded ((fun n:ℚ ↦ (n:ℝ)) '' .univ) := by sorry
 
-/-- Example 9.1.23 -/
-theorem R_unbounded (a: ℝ) : ¬ Bornology.IsBounded (.univ: Set ℝ) := by sorry
+/-- Example 9.1.23 (R) -/
+theorem R_unbounded : ¬ Bornology.IsBounded (.univ: Set ℝ) := by sorry
 
-/-- Theorem 9.1.24 / Exercise 9.1.13 (Heine-Borel theorem for the line)-/
+/-- Theorem 9.1.24 / Exercise 9.1.13 (Heine-Borel theorem for the line). -/
 theorem Heine_Borel (X: Set ℝ) :
   IsClosed X ∧ Bornology.IsBounded X ↔ ∀ a : ℕ → ℝ, (∀ n, a n ∈ X) →
   (∃ n : ℕ → ℕ, StrictMono n
     ∧ ∃ L ∈ X, Filter.atTop.Tendsto (fun j ↦ a (n j)) (nhds L)) := by
   sorry
 
-/-- Exercise 9.1.4 -/
+/-- Exercise 9.1.3 -/
 example : ∃ (X Y:Set ℝ), closure (X ∩ Y) ≠ closure X ∩ closure Y := by
   sorry
 
-/-- Exercise 9.1.6 -/
+/-- Exercise 9.1.5 -/
 example (X:Set ℝ) : IsClosed (closure X) := by
   sorry
 
@@ -344,11 +347,11 @@ example {I:Type} (X: I → Set ℝ) (hX: ∀ i, IsClosed (X i)) :
   IsClosed (⋂ i, X i) := by
   sorry
 
-/-- Exercise 9.1.9 -/
+/-- Exercise 9.1.9 (i) -/
 example {X:Set ℝ} {x:ℝ} (hx: AdherentPt x X) : LimitPt x X ∨ IsolatedPt x X := by
   sorry
 
-/-- Exercise 9.1.9 -/
+/-- Exercise 9.1.9 (ii) -/
 example {X:Set ℝ} {x:ℝ} : ¬ (LimitPt x X ∧ IsolatedPt x X) := by
   sorry
 

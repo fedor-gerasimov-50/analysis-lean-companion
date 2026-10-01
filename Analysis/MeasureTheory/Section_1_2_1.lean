@@ -50,12 +50,17 @@ lemma Box.isClosed_toSet_of_Icc {d : ℕ} (B : Box d)
 
 /-- Exercise 1.2.3(i) (Empty set) -/
 theorem Lebesgue_outer_measure.of_empty (d:ℕ) : Lebesgue_outer_measure (∅: Set (EuclideanSpace' d)) = 0 := by
-  sorry
+  obtain rfl | hd := Nat.eq_zero_or_pos d
+  · simp [Lebesgue_outer_measure_of_dim_zero]
+  · exact Countable.Lebesgue_measure hd Set.countable_empty
 
 /-- Exercise 1.2.3(ii) (Monotonicity) -/
 theorem Lebesgue_outer_measure.mono {d: ℕ} {E F : Set (EuclideanSpace' d)} (h : E ⊆ F) :
     Lebesgue_outer_measure E ≤ Lebesgue_outer_measure F := by
-  sorry
+  unfold Lebesgue_outer_measure
+  refine sInf_le_sInf ?_
+  rintro V ⟨X, S, hF, rfl⟩
+  exact ⟨X, S, h.trans hF, rfl⟩
 
 /-- Lebesgue outer measure is non-negative.
     Since it's the sInf of sums of box volumes, which are all ≥ 0, the result is ≥ 0. -/
@@ -2164,7 +2169,8 @@ example : set_dist (Ico 0 1).toSet (Icc 1 2).toSet = 0 := by
       exact dist_nonneg
 
 /-- Exercise 1.2.4 -/
-theorem dist_of_disj_compact_pos {d:ℕ} (E F: Set (EuclideanSpace' d)) (hE: IsCompact E) (hF: IsCompact F) (hdisj: E ∩ F = ∅) :
+theorem dist_of_disj_compact_pos {d:ℕ} (E F: Set (EuclideanSpace' d)) (hEn: E.Nonempty) (hFn: F.Nonempty)
+    (hE: IsCompact E) (hF: IsCompact F) (hdisj: E ∩ F = ∅) :
     set_dist E F > 0 := by
   sorry
 
@@ -2561,15 +2567,6 @@ lemma Box.shrink_to_closed {d:ℕ} (B: Box d) (hB: B.toSet.Nonempty) (δ: ℝ) (
       simp only [B', BoundedInterval.toSet, Set.mem_Icc, le_refl, and_self]
 
 namespace IsElementary
-/-- Elementary sets are bounded (finite union of bounded boxes) -/
-lemma isBounded {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: IsElementary E) :
-    Bornology.IsBounded E := by
-  obtain ⟨S, hS_eq⟩ := hE
-  rw [hS_eq]
-  rw [Bornology.isBounded_biUnion_finset]
-  intro B _
-  exact Box.isBounded B
-
 /-- Elementary measure of empty set is zero (handles proof term mismatch) -/
 lemma measure_of_empty_eq {d : ℕ} {E : Set (EuclideanSpace' d)}
     (hE : IsElementary E) (hempty : E = ∅) : hE.measure = 0 := by
@@ -3159,9 +3156,9 @@ example {d:ℕ} {hd: 0 < d} : ∃ (S:Type) (E: S → Set (EuclideanSpace' d)), �
   rw [h_cube, h_sum]
   simp
 
--- ========================================================================
---  Start of Helpers for remark 1.2.8 -/
--- ========================================================================
+/- ========================================================================
+   Start of Helpers for remark 1.2.8
+   ======================================================================== -/
 
 /-- The distance on {lean}`EuclideanSpace' 1` equals the distance in ℝ via {name}`EuclideanSpace'.equiv_Real` -/
 lemma EuclideanSpace'_dist_eq_Real_dist (x y : EuclideanSpace' 1) :
@@ -3551,9 +3548,9 @@ lemma U_lebesgue_le (ε : ℝ) (hε : 0 < ε) :
     _ ≤ ((2 * ε : ℝ) : EReal) := h_sum_bound
 
 end Remark_1_2_8
--- ========================================================================
---  End of Helpers for remark 1.2.8 -/
--- ========================================================================
+/- ========================================================================
+   End of Helpers for remark 1.2.8
+   ======================================================================== -/
 
 /-- Remark 1.2.8: There exists a bounded open set that is not Jordan measurable.
     Proof sketch: Take U = ⋃\_\{n\} (q\_n - ε/2^\{n+1\}, q\_n + ε/2^\{n+1\}) where \{q\_n\} enumerates ℚ ∩ \[0,1\].
@@ -4346,10 +4343,14 @@ theorem Box.sum_volume_eq {d:ℕ} (B B': ℕ → Box d) (hdisj: Pairwise (Functi
   exact h_toReal_eq
 
 /-- Exercise 1.2.5: For any set that equals a countable union of almost disjoint boxes,
-    the Lebesgue outer measure equals the Jordan inner measure. -/
+    the Lebesgue outer measure equals the Jordan inner measure.  The text asserts this for
+    unbounded sets too, "where we extend the definition of Jordan inner measure to unbounded sets
+    in the obvious manner", so {name}`Jordan_inner_measure'` is the notion intended here; stated
+    with the real-valued {name}`Jordan_inner_measure` the claim is false, as the whole space
+    shows. -/
 theorem Lebesgue_outer_measure.eq_Jordan_inner_of_boxes {d:ℕ} (E: Set (EuclideanSpace' d)) (B: ℕ → Box d)
     (hE: E = ⋃ n, (B n).toSet) (hdisj: Pairwise (Function.onFun AlmostDisjoint B)) :
-    Lebesgue_outer_measure E = Jordan_inner_measure E := by
+    Lebesgue_outer_measure E = Jordan_inner_measure' E := by
   sorry
 
 def IsCube {d:ℕ} (B: Box d) : Prop := ∃ r, ∀ i, |B.side i|ₗ = r
@@ -4789,6 +4790,10 @@ lemma dyadicCubeInteriorNonempty {d:ℕ} (n:ℤ) (a: Fin d → ℤ) :
     exact Set.nonempty_Ioo.mpr (div_lt_div_of_pos_right (by linarith) (zpow_pos (by norm_num) _))
   )).preimage (PiLp.homeomorph 2 (fun _ : Fin d => ℝ)).surjective
 
+lemma Box.toSet_nonempty_of_IsDyadic {d : ℕ} {B : Box d} (hB : B.IsDyadic) : B.toSet.Nonempty := by
+  obtain ⟨n, ⟨a, rfl⟩⟩ := hB
+  exact (dyadicCubeInteriorNonempty n a).mono (interior_subset (s := (DyadicCube n a).toSet))
+
 /-- At the same scale, dyadic cubes with different indices cannot have one contained in the other
     (since containment would imply empty interior for one). -/
 lemma dyadicCubeNoProperContainmentSameScale {d:ℕ} {n:ℤ} {a b : Fin d → ℤ}
@@ -5125,11 +5130,13 @@ theorem IsOpen.eq_union_boxes {d:ℕ} (hd : 0 < d) (E: Set (EuclideanSpace' d)) 
         have h_scale_lt : (↑(B_idx j).1 : ℤ) < ↑(B_idx i).1 := by exact_mod_cast hij_gt
         exact dyadicCubeLargerNotInSmaller hd h_scale_lt h_ji
 
-theorem Lebesgue_outer_measure.of_open {d:ℕ} (E: Set (EuclideanSpace' d)) (hE: IsOpen E) : Lebesgue_outer_measure E = Jordan_inner_measure E := by
+theorem Lebesgue_outer_measure.of_open {d:ℕ} (E: Set (EuclideanSpace' d)) (hE: IsOpen E) : Lebesgue_outer_measure E = Jordan_inner_measure' E := by
   by_cases hd : d = 0
   · -- Dimension 0: In dim 0, open sets are either ∅ or Set.univ
     subst hd
-    rw [Lebesgue_outer_measure_of_dim_zero]
+    -- every set is bounded in dimension zero, so the extended inner measure is the usual one
+    rw [Jordan_inner_measure'_eq_coe (EuclideanSpace'.isBounded_of_dim_zero E),
+      Lebesgue_outer_measure_of_dim_zero]
     by_cases hne : E.Nonempty
     · -- Case: E is nonempty → E = Set.univ in dimension 0
       simp only [hne, ↓reduceIte]
@@ -5232,7 +5239,8 @@ theorem Lebesgue_outer_measure.of_open {d:ℕ} (E: Set (EuclideanSpace' d)) (hE:
     by_cases hE_empty : E = ∅
     · -- Empty set case: use Lebesgue_outer_measure.of_empty and Jordan_inner_measure ∅ = 0
       subst hE_empty
-      rw [Lebesgue_outer_measure.of_empty]
+      rw [Jordan_inner_measure'_eq_coe Bornology.isBounded_empty,
+        Lebesgue_outer_measure.of_empty]
       -- Show (0 : EReal) = ↑(Jordan_inner_measure ∅)
       -- First prove Jordan_inner_measure ∅ = 0
       have h_jordan_empty : Jordan_inner_measure (∅ : Set (EuclideanSpace' d)) = 0 := by

@@ -20,7 +20,7 @@ namespace Chapter11
 open Chapter9 BoundedInterval
 
 set_option maxHeartbeats 300000 in
-/-- Proposition 11.6.1 -/
+/-- Proposition 11.6.1 (i) -/
 theorem integ_of_monotone {a b:ℝ} {f:ℝ → ℝ} (hf: MonotoneOn f (Icc a b)) :
   IntegrableOn f (Icc a b) := by
   -- This proof is adapted from the structure of the original text.
@@ -130,16 +130,17 @@ theorem integ_of_monotone {a b:ℝ} {f:ℝ → ℝ} (hf: MonotoneOn f (Icc a b))
   linarith [nonneg_of_le_const_mul_eps this]
 
 
-/-- Proposition 11.6.1 -/
+/-- Proposition 11.6.1 (ii) -/
 theorem integ_of_antitone {a b:ℝ} {f:ℝ → ℝ} (hf: AntitoneOn f (Icc a b)) :
   IntegrableOn f (Icc a b) := by
   rw [←neg_neg f]; apply (integ_of_monotone _).neg.1; convert hf.neg using 1
 
-/-- Corollary 11.6.3 / Exercise 11.6.1 -/
+/-- Corollary 11.6.3 (i) / Exercise 11.6.1 -/
 theorem integ_of_bdd_monotone {I:BoundedInterval} {f:ℝ → ℝ} (hbound: BddOn f I)
   (hf: MonotoneOn f I) : IntegrableOn f I := by
   sorry
 
+/-- Corollary 11.6.3 (ii) / Exercise 11.6.1 -/
 theorem integ_of_bdd_antitone {I:BoundedInterval} {f:ℝ → ℝ} (hbound: BddOn f I)
   (hf: AntitoneOn f I) : IntegrableOn f I := by
   sorry
@@ -147,17 +148,18 @@ theorem integ_of_bdd_antitone {I:BoundedInterval} {f:ℝ → ℝ} (hbound: BddOn
 /-- Proposition 11.6.4 (Integral test) -/
 theorem summable_iff_integ_of_antitone {f:ℝ → ℝ} (hnon: ∀ x ≥ 0, f x ≥ 0)
   (hf: AntitoneOn f (.Ici 0)) :
-  Summable f ↔ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
+  Summable (fun n:ℕ ↦ f n) ↔ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
   sorry
 
 -- Exercise 11.6.2: Formulate a reasonable notion of a piecewise monotone function, and then
 -- show that all bounded piecewise monotone functions are Riemann integrable.
 
-/-- Exercise 11.6.4 -/
-example : ∃ (f:ℝ → ℝ) (hnon: ∀ x ≥ 0, f x ≥ 0), Summable f ∧ ¬ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
+/-- Exercise 11.6.4 (a) -/
+example : ∃ (f:ℝ → ℝ), (∀ x ≥ 0, f x ≥ 0) ∧ Summable (fun n:ℕ ↦ f n) ∧ ¬ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
   sorry
 
-example : ∃ (f:ℝ → ℝ) (hnon: ∀ x ≥ 0, f x ≥ 0), ¬ Summable f ∧ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
+/-- Exercise 11.6.4 (b) -/
+example : ∃ (f:ℝ → ℝ), (∀ x ≥ 0, f x ≥ 0) ∧ ¬ Summable (fun n:ℕ ↦ f n) ∧ ∃ M, ∀ N ≥ 0, integ f (Icc 0 N) ≤ M := by
   sorry
 
 end Chapter11

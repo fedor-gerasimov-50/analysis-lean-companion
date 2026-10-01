@@ -26,7 +26,7 @@ inductive BoundedInterval where
 
 open BoundedInterval
 
-/-- There is a technical issue in that this coercion is not injective: the empty set is represented by multiple bounded intervals.  This causes some of the statements in this section to be a little uglier than necessary.-/
+/-- There is a technical issue in that this coercion is not injective: the empty set is represented by multiple bounded intervals.  This causes some of the statements in this section to be a little uglier than necessary. -/
 @[coe]
 def BoundedInterval.toSet (I: BoundedInterval) : Set ℝ := match I with
   | Ioo a b => .Ioo a b
@@ -93,7 +93,7 @@ theorem BoundedInterval.inter_eq (I J: BoundedInterval) : (I ∩ J : BoundedInte
   (BoundedInterval.inter I J).choose_spec.symm
 
 example :
-  (Ioo 2 4 ∩ Icc 4 6) = (Icc 4 4 : Set ℝ) := by
+  (Icc 2 4 ∩ Icc 4 6) = (Icc 4 4 : Set ℝ) := by
   sorry
 
 instance BoundedInterval.instMembership : Membership ℝ BoundedInterval where
@@ -411,7 +411,7 @@ example : ∃ P P' : Partition (Icc 1 4),
   P' ≤ P := by
   sorry
 
-/-- Definition 11.1.16 (Common refinement)-/
+/-- Definition 11.1.16 (Common refinement). -/
 noncomputable instance Partition.instMax (I: BoundedInterval) : Max (Partition I) where
   max P P' := {
     intervals := Finset.image₂ (fun J K ↦ J ∩ K) P.intervals P'.intervals
@@ -429,9 +429,12 @@ noncomputable instance Partition.instMax (I: BoundedInterval) : Max (Partition I
     }
 
 
-/-- Example 11.1.17 -/
-example : ∃ P P' : Partition (Icc 1 4), P.intervals = {Ico 1 3, Icc 3 4} ∧ P'.intervals = {Icc 1 2, Ioc 2 4} ∧
-  (P' ⊔ P).intervals = {Icc 1 2, Ioo 2 3, Icc 3 4, ∅} := by
+/-- Example 11.1.17. -/
+example : ∃ P P' : Partition (Icc 1 4),
+    P.intervals = {Ico 1 3, Icc 3 4} ∧
+    P'.intervals = {Icc 1 2, Ioc 2 4} ∧
+    (P' ⊔ P).intervals.image toSet =
+      {Set.Icc 1 2, Set.Ioo 2 3, Set.Icc 3 4, ∅} := by
   sorry
 
 /-- Lemma 11.1.8 / Exercise 11.1.4 -/

@@ -53,21 +53,21 @@ theorem IntegrableOn.const (c:ℝ) (I: BoundedInterval) :
   IntegrableOn (fun _ ↦ c) I ∧ integ (fun _ ↦ c) I = c * |I|ₗ := by
   sorry
 
-/-- Theorem 11.4.1(f) / Exercise 11.4.1 -/
+/-- Theorem 11.4.1(f') / Exercise 11.4.1 -/
 theorem IntegrableOn.const' {I: BoundedInterval} {f:ℝ → ℝ} (hf: ConstantOn f I) :
   IntegrableOn f I ∧ integ f I = (constant_value_on f I) * |I|ₗ := by
   sorry
 
 
 open Classical in
-/-- Theorem 11.4.1 (g)  / Exercise 11.4.1 -/
+/-- Theorem 11.4.1(g) / Exercise 11.4.1 -/
 theorem IntegrableOn.of_extend {I J: BoundedInterval} (hIJ: I ⊆ J)
   {f: ℝ → ℝ} (h: IntegrableOn f I) :
   IntegrableOn (fun x ↦ if x ∈ I then f x else 0) J := by
   sorry
 
 open Classical in
-/-- Theorem 11.4.1 (g)  / Exercise 11.4.1 -/
+/-- Theorem 11.4.1(g') / Exercise 11.4.1 -/
 theorem IntegrableOn.of_extend' {I J: BoundedInterval} (hIJ: I ⊆ J)
   {f: ℝ → ℝ} (h: IntegrableOn f I) :
   integ (fun x ↦ if x ∈ I then f x else 0) J = integ f I := by
@@ -98,7 +98,7 @@ lemma nonneg_of_le_const_mul_eps {x C:ℝ} (h: ∀ ε>0, x ≤ C * ε) : x ≤ 0
     linarith
   specialize h 1 ?_ <;> grind
 
-/-- Theorem 11.4.3 (Max and min preserve integrability)-/
+/-- Theorem 11.4.3 (Max and min preserve integrability). -/
 theorem IntegrableOn.max {I: BoundedInterval} {f g:ℝ → ℝ} (hf: IntegrableOn f I) (hg: IntegrableOn g I) :
   IntegrableOn (f ⊔ g) I  := by
   -- This proof is written to follow the structure of the original text.
@@ -144,7 +144,7 @@ theorem IntegrableOn.max {I: BoundedInterval} {f g:ℝ → ℝ} (hf: IntegrableO
 
 
 
-/-- Theorem 11.4.5 / Exercise 11.4.3.  The objective here is to create a shorter proof than the one above.-/
+/-- Theorem 11.4.5 / Exercise 11.4.3.  The objective here is to create a shorter proof than the one above. -/
 theorem IntegrableOn.min {I: BoundedInterval} {f g:ℝ → ℝ} (hf: IntegrableOn f I) (hg: IntegrableOn g I) :
   IntegrableOn (f ⊓ g) I  := by
   sorry
@@ -157,7 +157,7 @@ theorem IntegrableOn.abs {I: BoundedInterval} {f:ℝ → ℝ} (hf: IntegrableOn 
   ext x; obtain h | h := (show f x ≤ 0 ∨ f x ≥ 0 by grind) <;> simp [h]
 
 /-- Theorem 11.4.5 (Products preserve Riemann integrability).
-It is convenient to first establish the non-negative case.-/
+It is convenient to first establish the non-negative case. -/
 theorem integ_of_mul_nonneg {I: BoundedInterval} {f g:ℝ → ℝ} (hf: IntegrableOn f I) (hg: IntegrableOn g I)
   (hf_nonneg: MajorizesOn f 0 I) (hg_nonneg: MajorizesOn g 0 I) :
   IntegrableOn (f * g) I := by

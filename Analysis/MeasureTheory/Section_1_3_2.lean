@@ -1714,16 +1714,69 @@ theorem UnsignedMeasurable.TFAE {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Un
   tfae_finish
 
 /-- Exercise 1.3.3(i) -/
-theorem Continuous.UnsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Continuous f) (hnonneg: Unsigned f): UnsignedMeasurable f := by sorry
+theorem Continuous.UnsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Continuous f) (hnonneg: Unsigned f): _root_.UnsignedMeasurable f := by
+  have h_iff : _root_.UnsignedMeasurable f ↔ ∀ U : Set EReal, IsOpen U → LebesgueMeasurable (f ⁻¹' U) :=
+    (_root_.UnsignedMeasurable.TFAE hnonneg).out 0 9
+  apply h_iff.mpr
+  intro U hU
+  exact IsOpen.measurable (hU.preimage hf)
+
+/-- Unsigned simple functions are nonnegative. -/
+lemma UnsignedSimpleFunction.unsigned {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f) : Unsigned f := by
+  intro x
+  obtain ⟨k, c, E, hc, heq⟩ := hf
+  rw [heq]
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+  apply Finset.sum_nonneg
+  intro i _
+  have h1 : 0 ≤ c i := (hc i).2
+  have h2 : 0 ≤ EReal.indicator (E i) x := by
+    simp only [EReal.indicator, Real.EReal_fun]
+    exact EReal.coe_nonneg.mpr (Set.indicator_nonneg (fun _ _ => zero_le_one) x)
+  exact mul_nonneg h1 h2
 
 /-- Exercise 1.3.3(ii) -/
-theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f): UnsignedMeasurable f := by sorry
+theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f): UnsignedMeasurable f :=
+  ⟨hf.unsigned, fun _ ↦ f, fun _ ↦ hf, fun _ ↦ tendsto_const_nhds⟩
 
 /-- Exercise 1.3.3(iii) -/
-theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) := by sorry
+theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) := by
+  have hnonneg : Unsigned (fun x ↦ iSup (fun n ↦ f n x)) := by
+    intro x
+    exact le_trans ((hf 0).1 x) (le_iSup (fun n ↦ f n x) 0)
+  have h_iff : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) ↔
+      ∀ t, LebesgueMeasurable {x | iSup (fun n ↦ f n x) > t} :=
+    (UnsignedMeasurable.TFAE hnonneg).out 0 4
+  apply h_iff.mpr
+  intro t
+  have h_eq : {x | iSup (fun n ↦ f n x) > t} = ⋃ n, {x | f n x > t} := by
+    ext x
+    simp [lt_iSup_iff]
+  rw [h_eq]
+  refine LebesgueMeasurable.countable_union fun n => ?_
+  have hn : UnsignedMeasurable (f n) ↔ ∀ t, LebesgueMeasurable {x | f n x > t} :=
+    (UnsignedMeasurable.TFAE (hf n).1).out 0 4
+  exact hn.mp (hf n) t
 
 /-- Exercise 1.3.3(iii) -/
-theorem UnsignedMeasurable.inf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) := by sorry
+theorem UnsignedMeasurable.inf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) := by
+  have hnonneg : Unsigned (fun x ↦ iInf (fun n ↦ f n x)) := by
+    intro x
+    exact le_iInf fun n => (hf n).1 x
+  have h_iff : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) ↔
+      ∀ t, LebesgueMeasurable {x | iInf (fun n ↦ f n x) ≥ t} :=
+    (UnsignedMeasurable.TFAE hnonneg).out 0 5
+  apply h_iff.mpr
+  intro t
+  have h_eq : {x | iInf (fun n ↦ f n x) ≥ t} = ⋂ n, {x | f n x ≥ t} := by
+    ext x
+    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    exact le_iInf_iff
+  rw [h_eq]
+  refine LebesgueMeasurable.countable_inter fun n => ?_
+  have hn : UnsignedMeasurable (f n) ↔ ∀ t, LebesgueMeasurable {x | f n x ≥ t} :=
+    (UnsignedMeasurable.TFAE (hf n).1).out 0 5
+  exact hn.mp (hf n) t
 
 /-- Exercise 1.3.3(iii) -/
 theorem UnsignedMeasurable.limsup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ Filter.atTop.limsup (fun n ↦ f n x) ) := by sorry
@@ -1732,13 +1785,13 @@ theorem UnsignedMeasurable.limsup {d:ℕ} {f: ℕ → EuclideanSpace' d → ERea
 theorem UnsignedMeasurable.liminf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ Filter.atTop.liminf (fun n ↦ f n x) ) := by sorry
 
 /-- Exercise 1.3.3(iv) -/
-theorem UnsignedMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → EReal} (hf: UnsignedMeasurable f) (heq: AlmostEverywhereEqual f g) : UnsignedMeasurable g := by sorry
+theorem UnsignedMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → EReal} (hf: UnsignedMeasurable f) (hg : Unsigned g) (heq: AlmostEverywhereEqual f g) : UnsignedMeasurable g := by sorry
 
 /-- Exercise 1.3.3(v) -/
-theorem UnsignedMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → EReal} (g: ℕ → EuclideanSpace' d → EReal) (hf: ∀ n, UnsignedMeasurable (g n)) (heq: PointwiseAeConvergesTo g f) : UnsignedMeasurable f := by sorry
+theorem UnsignedMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → EReal} (g: ℕ → EuclideanSpace' d → EReal) (hf: ∀ n, UnsignedMeasurable (g n)) (hfn : Unsigned f) (heq: PointwiseAeConvergesTo g f) : UnsignedMeasurable f := by sorry
 
 /-- Exercise 1.3.3(vi) -/
-theorem UnsignedMeasurable.comp_cts {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedMeasurable f) {φ: EReal → EReal} (hφ: Continuous φ)  : UnsignedMeasurable (φ ∘ f) := by sorry
+theorem UnsignedMeasurable.comp_cts {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedMeasurable f) {φ: EReal → EReal} (hφ: Continuous φ) (hφnn : ∀ x ≥ 0, φ x ≥ 0) : UnsignedMeasurable (φ ∘ f) := by sorry
 
 /-- Exercise 1.3.3(vii) -/
 theorem UnsignedMeasurable.add {d:ℕ} {f g: EuclideanSpace' d → EReal} (hf: UnsignedMeasurable f) (hg: UnsignedMeasurable g) : UnsignedMeasurable (f + g) := by sorry
@@ -3194,7 +3247,7 @@ example : ∃ (f: EuclideanSpace' 1 → EReal) (_hf: UnsignedMeasurable f) (E: S
     rw [this]
     exact LebesgueMeasurable.inter h_meas hA'_meas
 
-/-- Definition 1.3.11 (Complex measurability)-/
+/-- Definition 1.3.11 (Complex measurability). -/
 def ComplexMeasurable {d:ℕ} (f: EuclideanSpace' d → ℂ) : Prop := ∃ (g: ℕ → EuclideanSpace' d → ℂ), (∀ n, ComplexSimpleFunction (g n)) ∧ (PointwiseConvergesTo g f)
 
 def RealMeasurable {d:ℕ} (f: EuclideanSpace' d → ℝ) : Prop := ∃ (g: ℕ → EuclideanSpace' d → ℝ), (∀ n, RealSimpleFunction (g n)) ∧ (PointwiseConvergesTo g f)
@@ -3257,8 +3310,8 @@ theorem RealMeasurable.TFAE {d:ℕ} {f: EuclideanSpace' d → ℝ}:
       RealMeasurable f,
       ∃ (g: ℕ → EuclideanSpace' d → ℝ), (∀ n, RealSimpleFunction (g n)) ∧ (PointwiseAeConvergesTo g f),
       UnsignedMeasurable (EReal.pos_fun f) ∧ UnsignedMeasurable (EReal.neg_fun f),
-      ∀ U: Set ℝ, IsOpen U → MeasurableSet (f⁻¹' U),
-      ∀ K: Set ℝ, IsClosed K → MeasurableSet (f⁻¹' K)
+      ∀ U: Set ℝ, IsOpen U → LebesgueMeasurable (f⁻¹' U),
+      ∀ K: Set ℝ, IsClosed K → LebesgueMeasurable (f⁻¹' K)
     ].TFAE
   := by sorry
 
@@ -3268,8 +3321,8 @@ theorem ComplexMeasurable.TFAE {d:ℕ} {f: EuclideanSpace' d → ℂ}:
       ∃ (g: ℕ → EuclideanSpace' d → ℂ), (∀ n, ComplexSimpleFunction (g n)) ∧ (PointwiseAeConvergesTo g f),
       RealMeasurable (Complex.re_fun f) ∧ RealMeasurable (Complex.im_fun f),
       UnsignedMeasurable (EReal.pos_fun (Complex.re_fun f)) ∧ UnsignedMeasurable (EReal.neg_fun (Complex.im_fun f)) ∧ UnsignedMeasurable (EReal.pos_fun (Complex.im_fun f)) ∧ UnsignedMeasurable (EReal.neg_fun (Complex.re_fun f)),
-      ∀ U: Set ℂ, IsOpen U → MeasurableSet (f⁻¹' U),
-      ∀ K: Set ℂ, IsClosed K → MeasurableSet (f⁻¹' K)
+      ∀ U: Set ℂ, IsOpen U → LebesgueMeasurable (f⁻¹' U),
+      ∀ K: Set ℂ, IsClosed K → LebesgueMeasurable (f⁻¹' K)
     ].TFAE
   := by sorry
 
@@ -3279,34 +3332,42 @@ theorem Continuous.RealMeasurable {d:ℕ} {f: EuclideanSpace' d → ℝ} (hf: Co
 theorem Continuous.ComplexMeasurable {d:ℕ} {f: EuclideanSpace' d → ℂ} (hf: Continuous f) : ComplexMeasurable f := by sorry
 
 /-- Exercise 1.3.8(ii) -/
-theorem UnsignedSimpleFunction.iff' {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Unsigned f) : UnsignedSimpleFunction f ↔ UnsignedMeasurable f ∧ Finite (f '' Set.univ) := by sorry
+theorem RealSimpleFunction.iff {d:ℕ} {f: EuclideanSpace' d → ℝ} : RealSimpleFunction f ↔ RealMeasurable f ∧ Finite (f '' Set.univ) := by sorry
+
+theorem ComplexSimpleFunction.iff {d:ℕ} {f: EuclideanSpace' d → ℂ} : ComplexSimpleFunction f ↔ ComplexMeasurable f ∧ Finite (f '' Set.univ) := by sorry
 
 /-- Exercise 1.3.8(iii) -/
-theorem RealMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → ℝ} (hf: RealMeasurable f) (heq: AlmostEverywhereEqual f g) : RealMeasurable g := by sorry
+theorem RealMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → ℝ} (hf: RealMeasurable f)
+    (heq: AlmostEverywhereEqual f g) : RealMeasurable g := by sorry
 
-theorem ComplexMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f) (heq: AlmostEverywhereEqual f g) : ComplexMeasurable g := by sorry
+theorem ComplexMeasurable.aeEqual {d:ℕ} {f g: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f)
+    (heq: AlmostEverywhereEqual f g) : ComplexMeasurable g := by sorry
 
 /-- Exercise 1.3.8(iv) -/
-theorem RealMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → ℝ} (g: ℕ → EuclideanSpace' d → ℝ) (hf: ∀ n, RealMeasurable (g n)) (heq: PointwiseAeConvergesTo g f) : RealMeasurable f := by sorry
+theorem RealMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → ℝ} (g: ℕ → EuclideanSpace' d → ℝ)
+    (hf : ∀ n, RealMeasurable (g n))
+    (heq: PointwiseAeConvergesTo g f) : RealMeasurable f := by sorry
 
-theorem ComplexMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → ℂ} (g: ℕ → EuclideanSpace' d → ℂ) (hf: ∀ n, ComplexMeasurable (g n)) (heq: PointwiseAeConvergesTo g f) : ComplexMeasurable f := by sorry
+theorem ComplexMeasurable.aeLimit {d:ℕ} {f: EuclideanSpace' d → ℂ} (g: ℕ → EuclideanSpace' d → ℂ)
+    (hf : ∀ n, ComplexMeasurable (g n))
+    (heq: PointwiseAeConvergesTo g f) : ComplexMeasurable f := by sorry
 
 /-- Exercise 1.3.8(v) -/
 theorem RealMeasurable.comp_cts {d:ℕ} {f: EuclideanSpace' d → ℝ} (hf: RealMeasurable f) {φ: ℝ → ℝ} (hφ: Continuous φ)  : RealMeasurable (φ ∘ f) := by sorry
 
 theorem ComplexMeasurable.comp_cts {d:ℕ} {f: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f) {φ: ℂ → ℂ} (hφ: Continuous φ)  : ComplexMeasurable (φ ∘ f) := by sorry
 
-/-- Exercise 1.3.8(vi) -/
+/-- Exercise 1.3.8(vi) (Sum of measurable functions) -/
 theorem RealMeasurable.add {d:ℕ} {f g: EuclideanSpace' d → ℝ} (hf: RealMeasurable f) (hg: RealMeasurable g) : RealMeasurable (f + g) := by sorry
 
 theorem ComplexMeasurable.add {d:ℕ} {f g: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f) (hg: ComplexMeasurable g) : ComplexMeasurable (f + g) := by sorry
 
-/-- Exercise 1.3.8(vi) -/
+/-- Exercise 1.3.8(vi') (Difference of measurable functions) -/
 theorem RealMeasurable.sub {d:ℕ} {f g: EuclideanSpace' d → ℝ} (hf: RealMeasurable f) (hg: RealMeasurable g) : RealMeasurable (f - g) := by sorry
 
 theorem ComplexMeasurable.sub {d:ℕ} {f g: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f) (hg: ComplexMeasurable g) : ComplexMeasurable (f - g) := by sorry
 
-/-- Exercise 1.3.8(vi) -/
+/-- Exercise 1.3.8(vi'') (Product of measurable functions) -/
 theorem RealMeasurable.mul {d:ℕ} {f g: EuclideanSpace' d → ℝ} (hf: RealMeasurable f) (hg: RealMeasurable g) : RealMeasurable (f * g) := by sorry
 
 theorem ComplexMeasurable.mul {d:ℕ} {f g: EuclideanSpace' d → ℂ} (hf: ComplexMeasurable f) (hg: ComplexMeasurable g) : ComplexMeasurable (f * g) := by sorry

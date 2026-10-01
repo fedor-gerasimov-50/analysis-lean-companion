@@ -1491,7 +1491,7 @@ def LocallyUniformlyConvergesTo {X Y:Type*} [PseudoMetricSpace X] [PseudoMetricS
 /-- Remark 1.3.22 -/
 theorem LocallyUniformlyConvergesTo.iff {d:ℕ} {Y:Type*} [PseudoMetricSpace Y] (f: ℕ → EuclideanSpace' d → Y) (g: EuclideanSpace' d → Y) :
   LocallyUniformlyConvergesTo f g ↔
-  ∀ x₀, ∃ U: Set (EuclideanSpace' d), x₀ ∈ U ∧ IsOpen U → UniformlyConvergesToOn f g U := by sorry
+  ∀ x₀, ∃ U: Set (EuclideanSpace' d), x₀ ∈ U ∧ IsOpen U ∧ UniformlyConvergesToOn f g U := by sorry
 
 def LocallyUniformlyConvergesToOn {X Y:Type*} [PseudoMetricSpace X] [PseudoMetricSpace Y] (f: ℕ → X → Y) (g: X → Y) (S: Set X): Prop :=
   LocallyUniformlyConvergesTo (fun n (x:S) ↦ f n x.val) (fun x ↦ g x.val)
@@ -1513,12 +1513,12 @@ example : PointwiseConvergesTo (fun n (x:EuclideanSpace' 1) ↦ if x.toReal > 0 
 
 example : ¬ LocallyUniformlyConvergesTo (fun n (x:EuclideanSpace' 1) ↦ if x.toReal > 0 then 1 / (n * x.toReal) else 0) (fun x ↦ 0) := by sorry
 
-/-- Theorem 1.3.26 (Egorov's theorem)-/
+/-- Theorem 1.3.26 (Egorov's theorem). -/
 theorem PointwiseAeConvergesTo.locallyUniformlyConverges_outside_small {d:ℕ} {f : ℕ → EuclideanSpace' d → ℂ} {g : EuclideanSpace' d → ℂ}
   (hf: ∀ n, ComplexMeasurable (f n))
   (hfg: PointwiseAeConvergesTo f g)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (E: Set (EuclideanSpace' d)), MeasurableSet E ∧
+  ∃ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E ∧
     Lebesgue_measure E ≤ ε ∧
     LocallyUniformlyConvergesToOn f g Eᶜ := by sorry
 
@@ -1526,7 +1526,7 @@ theorem PointwiseAeConvergesTo.locallyUniformlyConverges_outside_small {d:ℕ} {
 example : ∃ (d:ℕ) (f : ℕ → EuclideanSpace' d → ℝ) (g : EuclideanSpace' d → ℝ),
     (∀ n, RealMeasurable (f n)) ∧
     PointwiseAeConvergesTo f g ∧
-    ∀ (E: Set (EuclideanSpace' d)), MeasurableSet E ∧
+    ∀ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E ∧
       Lebesgue_measure E = 0 →
       ¬ LocallyUniformlyConvergesToOn f g Eᶜ := by sorry
 
@@ -1535,7 +1535,7 @@ example : ∃ (d:ℕ) (f : ℕ → EuclideanSpace' d → ℝ) (g : EuclideanSpac
     (∀ n, RealMeasurable (f n)) ∧
     PointwiseAeConvergesTo f g ∧
     ∃ (ε : ℝ) (hε : 0 < ε),
-      ∀ (E: Set (EuclideanSpace' d)), MeasurableSet E ∧
+      ∀ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E ∧
         Lebesgue_measure E ≤ ε →
         ¬ UniformlyConvergesToOn f g Eᶜ := by sorry
 
@@ -1544,40 +1544,42 @@ theorem PointwiseAeConvergesTo.uniformlyConverges_outside_small {d:ℕ} {f : ℕ
   (hf: ∀ n, ComplexMeasurable (f n))
   (hfg: PointwiseAeConvergesTo f g)
   (S: Set (EuclideanSpace' d))
+  (hSm: LebesgueMeasurable S)
   (hS: Lebesgue_measure S < ⊤)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (E: Set (EuclideanSpace' d)), MeasurableSet E ∧
+  ∃ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E ∧
     Lebesgue_measure E ≤ ε ∧
-    UniformlyConvergesToOn f g (Sᶜ ∪ E) := by sorry
+    UniformlyConvergesToOn f g (S ∩ Eᶜ) := by sorry
 
 /-- Theorem 1.3.28 (Lusin's theorem) -/
 theorem ComplexAbsolutelyIntegrable.approx_by_continuous_outside_small {d:ℕ} {f : EuclideanSpace' d → ℂ}
   (hf: ComplexAbsolutelyIntegrable f)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ MeasurableSet E ∧
+  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ LebesgueMeasurable E ∧
       Lebesgue_measure E ≤ ε ∧
       ∀ x ∉ E, g x = f x := by sorry
 
 /-- Lusin's theorem does not make the original function continuous outside of E -/
 example : ∃ (d:ℕ) (f : EuclideanSpace' d → ℝ),
     RealMeasurable f ∧
-    ∀ (E: Set (EuclideanSpace' d)), MeasurableSet E → Lebesgue_measure E ≤ 1 → ¬ ContinuousOn f Eᶜ := by sorry
+    ∀ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E → Lebesgue_measure E ≤ 1 →
+      ¬ ∀ x ∈ Eᶜ, ContinuousAt f x := by sorry
 
 def LocallyComplexAbsolutelyIntegrable {d:ℕ} (f: EuclideanSpace' d → ℂ) : Prop :=
-  ∀ (S: Set (EuclideanSpace' d)), MeasurableSet S ∧ Bornology.IsBounded S → ComplexAbsolutelyIntegrableOn f S
+  ∀ (S: Set (EuclideanSpace' d)), LebesgueMeasurable S ∧ Bornology.IsBounded S → ComplexAbsolutelyIntegrableOn f S
 
-/-- Exercise 1.3.23 (Lusin's theorem only requires local absolute integrability )-/
+/-- Exercise 1.3.23 (Lusin's theorem only requires local absolute integrability). -/
 theorem LocallyComplexAbsolutelyIntegrable.approx_by_continuous_outside_small {d:ℕ} {f : EuclideanSpace' d → ℂ}
   (hf: LocallyComplexAbsolutelyIntegrable f)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ MeasurableSet E ∧
+  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ LebesgueMeasurable E ∧
       Lebesgue_measure E ≤ ε ∧
       ∀ x ∉ E, g x = f x := by sorry
 
 theorem ComplexMeasurable.approx_by_continuous_outside_small {d:ℕ} {f : EuclideanSpace' d → ℂ}
   (hf: ComplexMeasurable f)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ MeasurableSet E ∧
+  ∃ (g : EuclideanSpace' d → ℂ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ LebesgueMeasurable E ∧
       Lebesgue_measure E ≤ ε ∧
       ∀ x ∉ E, g x = f x := by sorry
 
@@ -1590,7 +1592,7 @@ theorem ComplexMeasurable.iff_pointwiseae_of_continuous {d:ℕ} {f : EuclideanSp
 theorem UnsignedMeasurable.approx_by_continuous_outside_small {d:ℕ} {f : EuclideanSpace' d → EReal}
   (hf: UnsignedMeasurable f) (hfin: AlmostAlways (fun x ↦ f x < ⊤))
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (g : EuclideanSpace' d → ℝ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ MeasurableSet E ∧
+  ∃ (g : EuclideanSpace' d → ℝ) (E: Set (EuclideanSpace' d)), ContinuousOn g Eᶜ ∧ LebesgueMeasurable E ∧
       Lebesgue_measure E ≤ ε ∧
       ∀ x ∉ E, g x = f x := by sorry
 
@@ -1606,6 +1608,6 @@ def BoundedOn {X Y:Type*} [PseudoMetricSpace Y] (f: X → Y) (S: Set X) : Prop :
 theorem ComplexAbsolutelyIntegrable.almost_bounded {d:ℕ} {f : EuclideanSpace' d → ℂ}
   (hf: ComplexAbsolutelyIntegrable f)
   (ε : ℝ) (hε : 0 < ε) :
-  ∃ (E: Set (EuclideanSpace' d)), MeasurableSet E ∧
+  ∃ (E: Set (EuclideanSpace' d)), LebesgueMeasurable E ∧
     Lebesgue_measure E ≤ ε ∧
     BoundedOn f Eᶜ := by sorry

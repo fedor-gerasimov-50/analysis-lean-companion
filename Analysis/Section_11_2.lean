@@ -125,42 +125,43 @@ theorem PiecewiseConstantWith.mono {f:ℝ → ℝ} {I: BoundedInterval} {P P': P
   (hP: PiecewiseConstantWith f P) : PiecewiseConstantWith f P' := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (add). -/
 theorem PiecewiseConstantOn.add {f g: ℝ → ℝ} {I: BoundedInterval}
   (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) : PiecewiseConstantOn (f + g) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (sub). -/
 theorem PiecewiseConstantOn.sub {f g: ℝ → ℝ} {I: BoundedInterval}
   (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) : PiecewiseConstantOn (f - g) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (max). -/
 theorem PiecewiseConstantOn.max {f g: ℝ → ℝ} {I: BoundedInterval}
   (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) : PiecewiseConstantOn (max f g) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (min). -/
 theorem PiecewiseConstantOn.min {f g: ℝ → ℝ} {I: BoundedInterval}
   (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) : PiecewiseConstantOn (min f g) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (mul). -/
 theorem PiecewiseConstantOn.mul {f g: ℝ → ℝ} {I: BoundedInterval}
   (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) : PiecewiseConstantOn (f * g) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2 -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (smul). -/
 theorem PiecewiseConstantOn.smul {f: ℝ → ℝ} {I: BoundedInterval}
   (c:ℝ) (hf: PiecewiseConstantOn f I) : PiecewiseConstantOn (c • f) I := by
   sorry
 
-/-- Lemma 11.2.8 / Exercise 11.2.2.  I believe the hypothesis that {name}`g` does not vanish is not needed. -/
+/-- Lemma 11.2.8 / Exercise 11.2.2 (div). -/
 theorem PiecewiseConstantOn.div {f g: ℝ → ℝ} {I: BoundedInterval}
-  (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn f I) : PiecewiseConstantOn (f / g) I := by
+  (hf: PiecewiseConstantOn f I) (hg: PiecewiseConstantOn g I) (hg_ne : ∀ x ∈ I.toSet, g x ≠ 0) :
+  PiecewiseConstantOn (f / g) I := by
   sorry
 
-/-- Definition 11.2.9 (Piecewise constant integral I)-/
+/-- Definition 11.2.9 (Piecewise constant integral I). -/
 noncomputable abbrev PiecewiseConstantWith.integ (f:ℝ → ℝ) {I: BoundedInterval} (P: Partition I)  :
   ℝ := ∑ J ∈ P.intervals, constant_value_on f (J:Set ℝ) * |J|ₗ
 
@@ -226,7 +227,7 @@ theorem PiecewiseConstantOn.integ_congr {f g:ℝ → ℝ} {I: BoundedInterval}
   rw [←PiecewiseConstantWith.congr h]; exact hf.choose_spec
 
 /-- Example 11.2.15 -/
-example : PiecewiseConstantOn.integ f_11_2_4 (Icc 1 6) = 10 := by
+example : PiecewiseConstantOn.integ f_11_2_12 (Icc 1 4) = 10 := by
   sorry
 
 /-- Theorem 11.2.16 (a) (Laws of integration) / Exercise 11.2.4 -/
@@ -265,7 +266,7 @@ theorem PiecewiseConstantOn.integ_const (c: ℝ) (I: BoundedInterval) :
   integ (fun _ ↦ c) I = c * |I|ₗ := by
   sorry
 
-/-- Theorem 11.2.16 (f) (Laws of integration) / Exercise 11.2.4 -/
+/-- Theorem 11.2.16 (f') (Laws of integration) / Exercise 11.2.4 -/
 theorem PiecewiseConstantOn.integ_const' {f:ℝ → ℝ} {I: BoundedInterval} (h: ConstantOn f I) :
   integ f I = (constant_value_on f I) * |I|ₗ := by
   sorry
@@ -278,7 +279,7 @@ theorem PiecewiseConstantOn.of_extend {I J: BoundedInterval} (hIJ: I ⊆ J)
   sorry
 
 open Classical in
-/-- Theorem 11.2.16 (g) (Laws of integration) / Exercise 11.2.4 -/
+/-- Theorem 11.2.16 (g') (Laws of integration) / Exercise 11.2.4 -/
 theorem PiecewiseConstantOn.integ_of_extend {I J: BoundedInterval} (hIJ: I ⊆ J)
   {f: ℝ → ℝ} (h: PiecewiseConstantOn f I) :
   integ (fun x ↦ if x ∈ I then f x else 0) J = integ f I := by
@@ -289,7 +290,7 @@ theorem PiecewiseConstantOn.of_join {I J K: BoundedInterval} (hIJK: K.joins I J)
   (f: ℝ → ℝ) : PiecewiseConstantOn f K ↔ PiecewiseConstantOn f I ∧ PiecewiseConstantOn f J := by
   sorry
 
-/-- Theorem 11.2.16 (h) (Laws of integration) / Exercise 11.2.4 -/
+/-- Theorem 11.2.16 (h') (Laws of integration) / Exercise 11.2.4 -/
 theorem PiecewiseConstantOn.integ_of_join {I J K: BoundedInterval} (hIJK: K.joins I J)
   {f: ℝ → ℝ} (h: PiecewiseConstantOn f K) :
   integ f K = integ f I + integ f J := by

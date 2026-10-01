@@ -25,7 +25,7 @@ Users of the companion who have completed the exercises in this section are welc
 
 - (Add tip here)
 
---/
+-/
 
 namespace Chapter3
 
@@ -166,16 +166,16 @@ noncomputable abbrev SetTheory.Set.curry_equiv {X Y Z:Set} : (X → Y → Z) ≃
   right_inv _ := by simp
 
 /-- Definition 3.5.6.  The indexing set {name}`I` plays the role of $`{ i : 1 ≤ i ≤ n }` in the text.
-    See Exercise 3.5.10 below for some connections betweeen this concept and the preceding notion
+    See Exercise 3.5.10 below for some connections between this concept and the preceding notion
     of Cartesian product and ordered pair.  -/
 abbrev SetTheory.Set.tuple {I:Set} {X: I → Set} (x: ∀ i, X i) : Object :=
   ((fun i ↦ ⟨ x i, by rw [mem_iUnion]; use i; exact (x i).property ⟩):I → iUnion I X)
 
-/-- Definition 3.5.6 -/
+/-- Definition 3.5.6 (indexed product) -/
 abbrev SetTheory.Set.iProd {I: Set} (X: I → Set) : Set :=
   ((iUnion I X)^I).specify (fun t ↦ ∃ x : ∀ i, X i, t = tuple x)
 
-/-- Definition 3.5.6 -/
+/-- Definition 3.5.6 (membership in an indexed product) -/
 theorem SetTheory.Set.mem_iProd {I: Set} {X: I → Set} (t:Object) :
     t ∈ iProd X ↔ ∃ x: ∀ i, X i, t = tuple x := by
   simp only [iProd, specification_axiom'']; constructor
@@ -199,7 +199,7 @@ noncomputable abbrev SetTheory.Set.prod_associator (X Y Z:Set) : (X ×ˢ Y) ×ˢ
   right_inv _ := by simp
 
 /--
-  Example 3.5.10. I suspect most of the equivalences will require classical reasoning and only be
+  Example 3.5.10 (a). I suspect most of the equivalences will require classical reasoning and only be
   defined non-computably, but would be happy to learn of counterexamples.
 -/
 noncomputable abbrev SetTheory.Set.singleton_iProd_equiv (i:Object) (X:Set) :
@@ -209,14 +209,14 @@ noncomputable abbrev SetTheory.Set.singleton_iProd_equiv (i:Object) (X:Set) :
   left_inv := sorry
   right_inv := sorry
 
-/-- Example 3.5.10 -/
+/-- Example 3.5.10 (b) -/
 abbrev SetTheory.Set.empty_iProd_equiv (X: (∅:Set) → Set) : iProd X ≃ Unit where
   toFun := sorry
   invFun := sorry
   left_inv := sorry
   right_inv := sorry
 
-/-- Example 3.5.10 -/
+/-- Example 3.5.10 (c) -/
 noncomputable abbrev SetTheory.Set.iProd_of_const_equiv (I:Set) (X: Set) :
     iProd (fun _:I ↦ X) ≃ (I → X) where
   toFun := sorry
@@ -224,7 +224,7 @@ noncomputable abbrev SetTheory.Set.iProd_of_const_equiv (I:Set) (X: Set) :
   left_inv := sorry
   right_inv := sorry
 
-/-- Example 3.5.10 -/
+/-- Example 3.5.10 (d) -/
 noncomputable abbrev SetTheory.Set.iProd_equiv_prod (X: ({0,1}:Set) → Set) :
     iProd X ≃ (X ⟨ 0, by simp ⟩) ×ˢ (X ⟨ 1, by simp ⟩) where
   toFun := sorry
@@ -232,7 +232,7 @@ noncomputable abbrev SetTheory.Set.iProd_equiv_prod (X: ({0,1}:Set) → Set) :
   left_inv := sorry
   right_inv := sorry
 
-/-- Example 3.5.10 -/
+/-- Example 3.5.10 (e) -/
 noncomputable abbrev SetTheory.Set.iProd_equiv_prod_triple (X: ({0,1,2}:Set) → Set) :
     iProd X ≃ (X ⟨ 0, by simp ⟩) ×ˢ (X ⟨ 1, by simp ⟩) ×ˢ (X ⟨ 2, by simp ⟩) where
   toFun := sorry
@@ -417,35 +417,35 @@ theorem SetTheory.Set.tuple_trans {I:Set} {X: I → Set} {a b c: ∀ i, X i}
   (hab: tuple a = tuple b) (hbc : tuple b = tuple c) :
     tuple a = tuple c := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (a) -/
 theorem SetTheory.Set.prod_union (A B C:Set) : A ×ˢ (B ∪ C) = (A ×ˢ B) ∪ (A ×ˢ C) := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (b) -/
 theorem SetTheory.Set.prod_inter (A B C:Set) : A ×ˢ (B ∩ C) = (A ×ˢ B) ∩ (A ×ˢ C) := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (c) -/
 theorem SetTheory.Set.prod_diff (A B C:Set) : A ×ˢ (B \ C) = (A ×ˢ B) \ (A ×ˢ C) := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (d) -/
 theorem SetTheory.Set.union_prod (A B C:Set) : (A ∪ B) ×ˢ C = (A ×ˢ C) ∪ (B ×ˢ C) := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (e) -/
 theorem SetTheory.Set.inter_prod (A B C:Set) : (A ∩ B) ×ˢ C = (A ×ˢ C) ∩ (B ×ˢ C) := by sorry
 
-/-- Exercise 3.5.4 -/
+/-- Exercise 3.5.4 (f) -/
 theorem SetTheory.Set.diff_prod (A B C:Set) : (A \ B) ×ˢ C = (A ×ˢ C) \ (B ×ˢ C) := by sorry
 
-/-- Exercise 3.5.5 -/
+/-- Exercise 3.5.5 (a) -/
 theorem SetTheory.Set.inter_of_prod (A B C D:Set) :
     (A ×ˢ B) ∩ (C ×ˢ D) = (A ∩ C) ×ˢ (B ∩ D) := by sorry
 
-/- Exercise 3.5.5 -/
+/-- Exercise 3.5.5 (b) -/
 def SetTheory.Set.union_of_prod :
   Decidable (∀ (A B C D:Set), (A ×ˢ B) ∪ (C ×ˢ D) = (A ∪ C) ×ˢ (B ∪ D)) := by
   -- the first line of this construction should be `apply isTrue` or `apply isFalse`.
   sorry
 
-/- Exercise 3.5.5 -/
+/-- Exercise 3.5.5 (c) -/
 def SetTheory.Set.diff_of_prod :
   Decidable (∀ (A B C D:Set), (A ×ˢ B) \ (C ×ˢ D) = (A \ C) ×ˢ (B \ D)) := by
   -- the first line of this construction should be `apply isTrue` or `apply isFalse`.
@@ -472,7 +472,7 @@ theorem SetTheory.Set.direct_sum {X Y Z:Set} (f: Z → X) (g: Z → Y) :
 theorem SetTheory.Set.iProd_empty_iff {n:ℕ} {X: Fin n → Set} :
     iProd X = ∅ ↔ ∃ i, X i = ∅ := by sorry
 
-/-- Exercise 3.5.9-/
+/-- Exercise 3.5.9 -/
 theorem SetTheory.Set.iUnion_inter_iUnion {I J: Set} (A: I → Set) (B: J → Set) :
     (iUnion I A) ∩ (iUnion J B) = iUnion (I ×ˢ J) (fun p ↦ (A (fst p)) ∩ (B (snd p))) := by sorry
 

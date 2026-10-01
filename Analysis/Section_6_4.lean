@@ -38,38 +38,42 @@ theorem Sequence.limit_point_def (a:Sequence) (x:ℝ) :
 
 noncomputable abbrev Example_6_4_3 : Sequence := (fun (n:ℕ) ↦ 1 - (10:ℝ)^(-(n:ℤ)-1))
 
-/-- Example 6.4.3 -/
+/-- Example 6.4.3 (a) -/
 example : (0.1:ℝ).Adherent Example_6_4_3 0.8 := by sorry
 
-/-- Example 6.4.3 -/
+/-- Example 6.4.3 (b) -/
 example : ¬ (0.1:ℝ).ContinuallyAdherent Example_6_4_3 0.8 := by sorry
 
-/-- Example 6.4.3 -/
+/-- Example 6.4.3 (c) -/
 example : (0.1:ℝ).ContinuallyAdherent Example_6_4_3 1 := by sorry
 
-/-- Example 6.4.3 -/
+/-- Example 6.4.3 (d) -/
 example : Example_6_4_3.LimitPoint 1 := by sorry
 
 noncomputable abbrev Example_6_4_4 : Sequence :=
   (fun (n:ℕ) ↦ (-1:ℝ)^n * (1 + (10:ℝ)^(-(n:ℤ)-1)))
 
-/-- Example 6.4.4 -/
+/-- Example 6.4.4 (a) -/
 example : (0.1:ℝ).Adherent Example_6_4_4 1 := by sorry
 
-/-- Example 6.4.4 -/
+/-- Example 6.4.4 (b) -/
 example : (0.1:ℝ).ContinuallyAdherent Example_6_4_4 1 := by sorry
 
-/-- Example 6.4.4 -/
+/-- Example 6.4.4 (c) -/
 example : Example_6_4_4.LimitPoint 1 := by sorry
 
-/-- Example 6.4.4 -/
+/-- Example 6.4.4 (d) -/
 example : Example_6_4_4.LimitPoint (-1) := by sorry
 
-/-- Example 6.4.4 -/
+/-- Example 6.4.4 (e) -/
 example : ¬ Example_6_4_4.LimitPoint 0 := by sorry
 
-/-- Proposition 6.4.5 / Exercise 6.4.1 -/
+/-- Proposition 6.4.5 (a) / Exercise 6.4.1 -/
 theorem Sequence.limit_point_of_limit {a:Sequence} {x:ℝ} (h: a.TendsTo x) : a.LimitPoint x := by
+  sorry
+
+/-- Proposition 6.4.5 (b) / Exercise 6.4.1 -/
+theorem Sequence.limit_point_of_limit_unique {a:Sequence} {x y:ℝ} (h: a.TendsTo x) (hy: a.LimitPoint y) : x = y := by
   sorry
 
 /--
@@ -119,7 +123,7 @@ example : Example_6_4_8.liminf = ⊥ := by sorry
 noncomputable abbrev Example_6_4_9 : Sequence :=
   (fun (n:ℕ) ↦ if Even n then (n+1:ℝ)⁻¹ else -(n+1:ℝ)⁻¹)
 
-example (n:ℕ) : Example_6_4_9.upperseq n = if Even n then (n+1:ℝ)⁻¹ else -(n+2:ℝ)⁻¹ := by sorry
+example (n:ℕ) : Example_6_4_9.upperseq n = if Even n then (n+1:ℝ)⁻¹ else (n+2:ℝ)⁻¹ := by sorry
 
 example : Example_6_4_9.limsup = 0 := by sorry
 
@@ -131,11 +135,11 @@ noncomputable abbrev Example_6_4_10 : Sequence := (fun (n:ℕ) ↦ (n+1:ℝ))
 
 example (n:ℕ) : Example_6_4_10.upperseq n = ⊤ := by sorry
 
-example : Example_6_4_9.limsup = ⊤ := by sorry
+example : Example_6_4_10.limsup = ⊤ := by sorry
 
-example (n:ℕ) : Example_6_4_9.lowerseq n = n+1 := by sorry
+example (n:ℕ) : Example_6_4_10.lowerseq n = n+1 := by sorry
 
-example : Example_6_4_9.liminf = ⊤ := by sorry
+example : Example_6_4_10.liminf = ⊤ := by sorry
 
 /-- Proposition 6.4.12(a) -/
 theorem Sequence.gt_limsup_bounds {a:Sequence} {x:EReal} (h: x > a.limsup) :
@@ -150,7 +154,7 @@ theorem Sequence.gt_limsup_bounds {a:Sequence} {x:EReal} (h: x > a.limsup) :
   convert lt_of_le_of_lt ((a.from N).le_sup hn') ha using 1
   grind
 
-/-- Proposition 6.4.12(a) -/
+/-- Proposition 6.4.12(a') -/
 theorem Sequence.lt_liminf_bounds {a:Sequence} {y:EReal} (h: y < a.liminf) :
     ∃ N ≥ a.m, ∀ n ≥ N, a n > y := by
   sorry
@@ -163,7 +167,7 @@ theorem Sequence.lt_limsup_bounds {a:Sequence} {x:EReal} (h: x < a.limsup) {N:�
   choose n hn hxn _ using exists_between_lt_sup hx
   grind
 
-/-- Proposition 6.4.12(b) -/
+/-- Proposition 6.4.12(b') -/
 theorem Sequence.gt_liminf_bounds {a:Sequence} {x:EReal} (h: x > a.liminf) {N:ℤ} (hN: N ≥ a.m) :
     ∃ n ≥ N, a n < x := by
   sorry
@@ -171,10 +175,10 @@ theorem Sequence.gt_liminf_bounds {a:Sequence} {x:EReal} (h: x > a.liminf) {N:�
 /-- Proposition 6.4.12(c) / Exercise 6.4.3 -/
 theorem Sequence.inf_le_liminf (a:Sequence) : a.inf ≤ a.liminf := by sorry
 
-/-- Proposition 6.4.12(c) / Exercise 6.4.3 -/
+/-- Proposition 6.4.12(c') / Exercise 6.4.3 -/
 theorem Sequence.liminf_le_limsup (a:Sequence) : a.liminf ≤ a.limsup := by sorry
 
-/-- Proposition 6.4.12(c) / Exercise 6.4.3 -/
+/-- Proposition 6.4.12(c'') / Exercise 6.4.3 -/
 theorem Sequence.limsup_le_sup (a:Sequence) : a.limsup ≤ a.sup := by sorry
 
 /-- Proposition 6.4.12(d) / Exercise 6.4.3 -/
@@ -187,7 +191,7 @@ theorem Sequence.limit_point_of_limsup {a:Sequence} {L_plus:ℝ} (h: a.limsup = 
     a.LimitPoint L_plus := by
   sorry
 
-/-- Proposition 6.4.12(e) / Exercise 6.4.3 -/
+/-- Proposition 6.4.12(e') / Exercise 6.4.3 -/
 theorem Sequence.limit_point_of_liminf {a:Sequence} {L_minus:ℝ} (h: a.liminf = L_minus) :
     a.LimitPoint L_minus := by
   sorry
@@ -197,19 +201,19 @@ theorem Sequence.tendsTo_iff_eq_limsup_liminf {a:Sequence} (c:ℝ) :
   a.TendsTo c ↔ a.liminf = c ∧ a.limsup = c := by
   sorry
 
-/-- Lemma 6.4.13 (Comparison principle) / Exercise 6.4.4 -/
+/-- Lemma 6.4.13 (Comparison principle, sup) / Exercise 6.4.4 -/
 theorem Sequence.sup_mono {a b:Sequence} (hm: a.m = b.m) (hab: ∀ n ≥ a.m, a n ≤ b n) :
     a.sup ≤ b.sup := by sorry
 
-/-- Lemma 6.4.13 (Comparison principle) / Exercise 6.4.4 -/
+/-- Lemma 6.4.13 (Comparison principle, inf) / Exercise 6.4.4 -/
 theorem Sequence.inf_mono {a b:Sequence} (hm: a.m = b.m) (hab: ∀ n ≥ a.m, a n ≤ b n) :
     a.inf ≤ b.inf := by sorry
 
-/-- Lemma 6.4.13 (Comparison principle) / Exercise 6.4.4 -/
+/-- Lemma 6.4.13 (Comparison principle, limsup) / Exercise 6.4.4 -/
 theorem Sequence.limsup_mono {a b:Sequence} (hm: a.m = b.m) (hab: ∀ n ≥ a.m, a n ≤ b n) :
     a.limsup ≤ b.limsup := by sorry
 
-/-- Lemma 6.4.13 (Comparison principle) / Exercise 6.4.4 -/
+/-- Lemma 6.4.13 (Comparison principle, liminf) / Exercise 6.4.4 -/
 theorem Sequence.liminf_mono {a b:Sequence} (hm: a.m = b.m) (hab: ∀ n ≥ a.m, a n ≤ b n) :
     a.liminf ≤ b.liminf := by sorry
 
@@ -218,19 +222,19 @@ theorem Sequence.lim_of_between {a b c:Sequence} {L:ℝ} (hm: b.m = a.m ∧ c.m 
   (hab: ∀ n ≥ a.m, a n ≤ b n ∧ b n ≤ c n) (ha: a.TendsTo L) (hb: c.TendsTo L) :
     b.TendsTo L := by sorry
 
-/-- Example 6.4.15 -/
+/-- Example 6.4.15 (a) -/
 example : ((fun (n:ℕ) ↦ 2/(n+1:ℝ)):Sequence).TendsTo 0 := by
   sorry
 
-/-- Example 6.4.15 -/
+/-- Example 6.4.15 (b) -/
 example : ((fun (n:ℕ) ↦ -2/(n+1:ℝ)):Sequence).TendsTo 0 := by
   sorry
 
-/-- Example 6.4.15 -/
+/-- Example 6.4.15 (c) -/
 example : ((fun (n:ℕ) ↦ (-1)^n/(n+1:ℝ) + 1 / (n+1)^2):Sequence).TendsTo 0 := by
   sorry
 
-/-- Example 6.4.15 -/
+/-- Example 6.4.15 (d) -/
 example : ((fun (n:ℕ) ↦ (2:ℝ)^(-(n:ℤ))):Sequence).TendsTo 0 := by
   sorry
 
@@ -304,7 +308,7 @@ theorem Sequence.Cauchy_iff_convergent (a:Sequence) :
 theorem Sequence.sup_not_strict_mono : ∃ (a b:ℕ → ℝ), (∀ n, a n < b n) ∧ ¬ (a:Sequence).sup < (b:Sequence).sup := by
   sorry
 
-/- Exercise 6.4.7 -/
+/-- Exercise 6.4.7 -/
 def Sequence.tendsTo_real_iff :
   Decidable (∀ (a:Sequence) (x:ℝ), a.TendsTo x ↔ a.abs.TendsTo x) := by
   -- The first line of this construction should be `apply isTrue` or `apply isFalse`.
@@ -313,10 +317,10 @@ def Sequence.tendsTo_real_iff :
 /-- This definition is needed for Exercises 6.4.8 and 6.4.9. -/
 abbrev Sequence.ExtendedLimitPoint (a:Sequence) (x:EReal) : Prop := if x = ⊤ then ¬ a.BddAbove else if x = ⊥ then ¬ a.BddBelow else a.LimitPoint x.toReal
 
-/-- Exercise 6.4.8 -/
+/-- Exercise 6.4.8 (i) -/
 theorem Sequence.extended_limit_point_of_limsup (a:Sequence) : a.ExtendedLimitPoint a.limsup := by sorry
 
-/-- Exercise 6.4.8 -/
+/-- Exercise 6.4.8 (ii) -/
 theorem Sequence.extended_limit_point_of_liminf (a:Sequence) : a.ExtendedLimitPoint a.liminf := by sorry
 
 theorem Sequence.extended_limit_point_le_limsup {a:Sequence} {L:EReal} (h:a.ExtendedLimitPoint L): L ≤ a.limsup := by sorry

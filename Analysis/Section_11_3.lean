@@ -27,7 +27,7 @@ abbrev MinorizesOn (g f:ℝ → ℝ) (I: BoundedInterval) : Prop := ∀ x ∈ (I
 
 theorem MinorizesOn.iff (g f:ℝ → ℝ) (I: BoundedInterval) : MinorizesOn g f I ↔ MajorizesOn f g I := by rfl
 
-/-- Definition 11.3.2 (Uppper and lower Riemann integrals )-/
+/-- Definition 11.3.2 (Upper and lower Riemann integrals ). -/
 noncomputable abbrev upper_integral (f:ℝ → ℝ) (I: BoundedInterval) : ℝ :=
   sInf ((PiecewiseConstantOn.integ · I) '' {g | MajorizesOn g f I ∧ PiecewiseConstantOn g I})
 
@@ -120,7 +120,7 @@ lemma gt_of_lt_lower_integral {f:ℝ → ℝ} {I: BoundedInterval} (hf: BddOn f 
   simp at hY; peel hY; simp_all; tauto
 
 /-- Definition 11.3.4 (Riemann integral)
-As we permit junk values, the simplest definition for the Riemann integral is the upper integral.-/
+As we permit junk values, the simplest definition for the Riemann integral is the upper integral. -/
 noncomputable abbrev integ (f:ℝ → ℝ) (I: BoundedInterval) : ℝ := upper_integral f I
 
 theorem integ_congr {f g:ℝ → ℝ} {I: BoundedInterval} (h: Set.EqOn f g I) :
@@ -151,12 +151,12 @@ noncomputable abbrev lower_riemann_sum (f:ℝ → ℝ) {I: BoundedInterval} (P: 
 
 /-- Lemma 11.3.11 / Exercise 11.3.4 -/
 theorem upper_riemann_sum_le {f g: ℝ → ℝ} {I:BoundedInterval} (P: Partition I)
-  (hf: BddOn f I) (hgf: MajorizesOn g f I) (hg: PiecewiseConstantOn g I) :
+  (hgf: MajorizesOn g f I) (hg: PiecewiseConstantWith g P) :
   upper_riemann_sum f P ≤ integ g I := by
    sorry
 
 theorem lower_riemann_sum_ge {f h: ℝ → ℝ} {I:BoundedInterval} (P: Partition I)
-  (hf: BddOn f I) (hfh: MinorizesOn h f I) (hg: PiecewiseConstantOn h I) :
+  (hfh: MinorizesOn h f I) (hg: PiecewiseConstantWith h P) :
   integ h I ≤ lower_riemann_sum f P := by
    sorry
 
@@ -177,14 +177,14 @@ theorem lower_integ_eq_sup_lower_sum {f:ℝ → ℝ} {I:BoundedInterval} (hf: Bd
   lower_integral f I = sSup (.range (fun P : Partition I ↦ lower_riemann_sum f P)) := by
   sorry
 
-/-- Exercise 11.3.1 -/
+/-- Exercise 11.3.1 (i) -/
 theorem MajorizesOn.trans {f g h: ℝ → ℝ} {I: BoundedInterval}
   (hfg: MajorizesOn f g I) (hgh: MajorizesOn g h I) : MajorizesOn f h I := by
   sorry
 
-/-- Exercise 11.3.1 -/
+/-- Exercise 11.3.1 (ii) -/
 theorem MajorizesOn.anti_symm {f g: ℝ → ℝ} {I: BoundedInterval}:
-  ∀ x ∈ (I:Set ℝ), f x = g x ↔ MajorizesOn f g I ∧ MajorizesOn g f I := by
+  (∀ x ∈ (I:Set ℝ), f x = g x) ↔ MajorizesOn f g I ∧ MajorizesOn g f I := by
   sorry
 
 /-- Exercise 11.3.2 -/

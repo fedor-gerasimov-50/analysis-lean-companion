@@ -205,8 +205,12 @@ private lemma IsClosed.measurable_of_bounded {d:ℕ} {E: Set (EuclideanSpace' d)
             intro hxi
             exact (hQ_sub hxi).2 hxE
           -- By compactness: set_dist E F_t > 0 (t is nonempty, so F_t is nonempty)
+          have ht_ne : t.Nonempty := Finset.nonempty_iff_ne_empty.mpr ht_empty
+          obtain ⟨i, hi⟩ := ht_ne
+          have hF_nonempty : F_t.Nonempty :=
+            (Box.toSet_nonempty_of_IsDyadic (hQ_dyadic i)).mono (Set.subset_biUnion_of_mem hi)
           have h_sep : set_dist E F_t > 0 :=
-            dist_of_disj_compact_pos E F_t hE_compact hF_compact hE_F_disj
+            dist_of_disj_compact_pos E F_t hE_nonempty hF_nonempty hE_compact hF_compact hE_F_disj
           -- By separation: m*(E ∪ F_t) = m*(E) + m*(F_t)
           have h_add : Lebesgue_outer_measure (E ∪ F_t) =
                        Lebesgue_outer_measure E + Lebesgue_outer_measure F_t :=
@@ -351,7 +355,7 @@ theorem IsClosed.measurable {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: IsClosed E
 
 abbrev IsNull {d:ℕ} (E: Set (EuclideanSpace' d)) : Prop := Lebesgue_outer_measure E = 0
 
-/-- Lemma 1.2.13(iii) (Every null set is Lebesgue measurable).-/
+/-- Lemma 1.2.13(iii) (Every null set is Lebesgue measurable). -/
 theorem IsNull.measurable {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: IsNull E) : LebesgueMeasurable E := by
   -- Strategy: For any ε > 0, since m*(E) = 0, get a box cover with total volume < ε,
   -- then inflate boxes to open sets. The union is open and contains E.
@@ -514,7 +518,7 @@ lemma IsNull.subset {d:ℕ} {E F : Set (EuclideanSpace' d)} (hE : IsNull E) (hFE
   rw [hE] at this
   exact le_antisymm this (Lebesgue_outer_measure.nonneg F)
 
-/-- Lemma 1.2.13(iv) (Empty set is measurable).-/
+/-- Lemma 1.2.13(iv) (Empty set is measurable). -/
 theorem LebesgueMeasurable.empty {d:ℕ} : LebesgueMeasurable (∅: Set (EuclideanSpace' d)) :=
 -- use (i) directly
   IsOpen.measurable isOpen_empty
@@ -532,7 +536,7 @@ theorem LebesgueMeasurable.empty' {d:ℕ} : LebesgueMeasurable (∅: Set (Euclid
     rw [Lebesgue_outer_measure.of_empty d]
     exact le_of_lt hε
 
-/-- Lemma 1.2.13(vi) (Countable union of measurable sets is measurable).-/
+/-- Lemma 1.2.13(vi) (Countable union of measurable sets is measurable). -/
 theorem LebesgueMeasurable.countable_union {d:ℕ} {E: ℕ → Set (EuclideanSpace' d)} (hE: ∀ n, LebesgueMeasurable (E n)) : LebesgueMeasurable (⋃ n, E n) := by
   -- Use the ε/2^n trick: let ε > 0 be arbitrary
   intro ε hε
@@ -897,7 +901,7 @@ lemma LebesgueMeasurable.closedBall {d : ℕ} (c : EuclideanSpace' d) (r : ℝ) 
     LebesgueMeasurable (Metric.closedBall c r) :=
   Metric.isClosed_closedBall.measurable
 
-/-- Exercise 1.2.7 (Criteria for measurability)-/
+/-- Exercise 1.2.7 (Criteria for measurability). -/
 theorem LebesgueMeasurable.TFAE {d:ℕ} (E: Set (EuclideanSpace' d)) :
     [
       LebesgueMeasurable E,
@@ -928,7 +932,7 @@ theorem CantorSet.uncountable : Uncountable CantorSet := by
 
 theorem CantorSet.null : IsNull (Real.equiv_EuclideanSpace' '' CantorSet) := by sorry
 
-/-- Exercise 1.2.10 (\[0,1) is not the countable union of pairwise disjoint closed intervals)-/
+/-- Exercise 1.2.10 (\[0,1) is not the countable union of pairwise disjoint closed intervals). -/
 example : ¬ ∃ (I: ℕ → BoundedInterval), (∀ n, IsClosed (I n).toSet) ∧ (Set.univ.PairwiseDisjoint (fun n ↦ (I n).toSet) ) ∧ (⋃ n, (I n).toSet = Set.Ico 0 1) := by
   sorry
 
@@ -1026,7 +1030,7 @@ private lemma Lebesgue_measure.countable_union_compact {d:ℕ} (hd : 0 < d)
             have h_nonempty_union : (⋃ n ∈ Finset.range N, E n).Nonempty :=
               Set.nonempty_iff_ne_empty.mpr h_empty_union
             have h_sep : set_dist (⋃ n ∈ Finset.range N, E n) (E N) > 0 :=
-              dist_of_disj_compact_pos _ _ hcompact_finite (hcompact N) h_disj_parts
+              dist_of_disj_compact_pos _ _ h_nonempty_union h_nonempty_N hcompact_finite (hcompact N) h_disj_parts
             have h_add := Lebesgue_outer_measure.union_of_separated hd h_sep
             -- h_add : Lebesgue_outer_measure (...) = Lebesgue_outer_measure (...) + Lebesgue_outer_measure (E N)
             -- Since Lebesgue_measure = Lebesgue_outer_measure, we can use this directly
@@ -1632,23 +1636,23 @@ theorem Lebesgue_measure.union {d:ℕ} {E F: Set (EuclideanSpace' d)} (hE: Lebes
   rw [tsum_fintype]
   simp only [S, Fin.sum_univ_two, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one]
 
-/-- Exercise 1.2.11(a) (Upward monotone convergence)-/
+/-- Exercise 1.2.11(a) (Upward monotone convergence). -/
 theorem Lebesgue_measure.upward_monotone_convergence {d:ℕ} {E: ℕ → Set (EuclideanSpace' d)} (hE: ∀ n, LebesgueMeasurable (E n)) (hmono: ∀ n, E n ⊆ E (n + 1)) : Filter.atTop.Tendsto (fun n ↦ Lebesgue_measure (E n)) (nhds (Lebesgue_measure (⋃ n, E n))) := by
   sorry
 
-/-- Exercise 1.2.11(b) (Downward monotone convergence)-/
+/-- Exercise 1.2.11(b) (Downward monotone convergence). -/
 theorem Lebesgue_measure.downward_monotone_convergence {d:ℕ} {E: ℕ → Set (EuclideanSpace' d)} (hE: ∀ n, LebesgueMeasurable (E n)) (hmono: ∀ n, E (n+1) ⊆ E n) (hfin: ∃ n, Lebesgue_measure (E n) < ⊤) : Filter.atTop.Tendsto (fun n ↦ Lebesgue_measure (E n)) (nhds (Lebesgue_measure (⋂ n, E n))) := by
   sorry
 
-/-- Exercise 1.2.11 (c) (counterexample)-/
+/-- Exercise 1.2.11 (c) (counterexample). -/
 example : ∃ (d:ℕ) (E: ℕ → Set (EuclideanSpace' d)) (hE: ∀ n, LebesgueMeasurable (E n)) (hmono: ∀ n, E (n+1) ⊆ E n), ¬ Filter.atTop.Tendsto (fun n ↦ Lebesgue_measure (E n)) (nhds (Lebesgue_measure (⋂ n, E n))) := by sorry
 
-/-- Exercise 1.2.12 -/
+/-- Exercise 1.2.12(i) (Monotonicity) -/
 example {d:ℕ} (m: Set (EuclideanSpace' d) → EReal) (h_empty: m ∅ = 0) (h_pos: ∀ E, 0 ≤ m E) (hadd: ∀ E: ℕ → Set (EuclideanSpace' d), (Set.univ.PairwiseDisjoint E) → (∀ n, LebesgueMeasurable (E n)) → m (⋃ n, E n) = ∑' n, m (E n)) {E F: Set (EuclideanSpace' d)}
 (hsub: E ⊆ F) (hE: LebesgueMeasurable E) (hF: LebesgueMeasurable F) : m E ≤ m F := by
   sorry
 
-/-- Exercise 1.2.12 -/
+/-- Exercise 1.2.12(ii) (σ-subadditivity) -/
 example {d:ℕ} (m: Set (EuclideanSpace' d) → EReal) (h_empty: m ∅ = 0) (h_pos: ∀ E, 0 ≤ m E) (hadd: ∀ E: ℕ → Set (EuclideanSpace' d), (Set.univ.PairwiseDisjoint E) → (∀ n, LebesgueMeasurable (E n)) → m (⋃ n, E n) = ∑' n, m (E n)) {E: ℕ → Set (EuclideanSpace' d)} (hE: ∀ n, LebesgueMeasurable (E n)):  m (⋃ n, E n) ≤ ∑' n, m (E n) := by
   sorry
 
@@ -1670,11 +1674,11 @@ example : ∃ (d:ℕ) (E: ℕ → Set (EuclideanSpace' d)) (E₀ F: Set (Euclide
 /-- Exercise 1.2.14 -/
 example {d:ℕ} (E: Set (EuclideanSpace' d)) : ∃ (F: Set (EuclideanSpace' d)), E ⊆ F ∧ LebesgueMeasurable F ∧ Lebesgue_measure F = Lebesgue_outer_measure E := by sorry
 
-/-- Exercise 1.2.15 (Inner regularity)-/
+/-- Exercise 1.2.15 (Inner regularity). -/
 theorem Lebesgue_measure.eq {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: LebesgueMeasurable E): Lebesgue_measure E = sSup { M | ∃ K, K ⊆ E ∧ IsCompact K ∧ M = Lebesgue_measure K} := by
   sorry
 
-/-- Exercise 1.2.16 (Criteria for measurability)-/
+/-- Exercise 1.2.16 (Criteria for finite measure). -/
 theorem LebesgueMeasurable.finite_TFAE {d:ℕ} (E: Set (EuclideanSpace' d)) :
     [
       LebesgueMeasurable E ∧ Lebesgue_measure E < ⊤,
@@ -1689,7 +1693,7 @@ theorem LebesgueMeasurable.finite_TFAE {d:ℕ} (E: Set (EuclideanSpace' d)) :
     ].TFAE
   := by sorry
 
-/-- Exercise 1.2.17 (Caratheodory criterion one direction)-/
+/-- Exercise 1.2.17 (Caratheodory criterion one direction). -/
 theorem LebesgueMeasurable.caratheodory {d:ℕ} (E: Set (EuclideanSpace' d)) :
     [
       LebesgueMeasurable E,
@@ -1698,21 +1702,22 @@ theorem LebesgueMeasurable.caratheodory {d:ℕ} (E: Set (EuclideanSpace' d)) :
     ].TFAE
   := by sorry
 
-theorem Bornology.IsBounded.inElementary {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E) : ∃ (A: Set (EuclideanSpace' d)), IsElementary A ∧ E ⊆ A := by sorry
+theorem Bornology.IsBounded.inElementary {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E) : ∃ (A: Set (EuclideanSpace' d)), IsElementary A ∧ E ⊆ A :=
+  IsElementary.contains_bounded hE
 
 noncomputable def inner_measure {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E) : ℝ := (Lebesgue_measure hE.inElementary.choose).toReal - (Lebesgue_measure (hE.inElementary.choose \ E)).toReal
 
-/-- Exercise 1.2.18(i) (Inner measure)-/
+/-- Exercise 1.2.18(i) (Inner measure). -/
 theorem inner_measure.eq {d:ℕ} {E A: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E)
   (hA: IsElementary A) (hsub: E ⊆ A) : inner_measure hE = Lebesgue_measure A - Lebesgue_outer_measure (A \ E) := by
   sorry
 
-/-- Exercise 1.2.18(ii) (Inner measure)-/
+/-- Exercise 1.2.18(ii) (Inner measure). -/
 theorem inner_measure.le {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E)
   : inner_measure hE ≤ Lebesgue_outer_measure E := by
   sorry
 
-/-- Exercise 1.2.18(ii) (Inner measure)-/
+/-- Exercise 1.2.18(ii') (Inner measure). -/
 theorem inner_measure.eq_iff {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: Bornology.IsBounded E)
   : inner_measure hE = Lebesgue_outer_measure E ↔ LebesgueMeasurable E := by
   sorry
@@ -1740,25 +1745,25 @@ theorem Lebesgue_measure.translate {d:ℕ} {E: Set (EuclideanSpace' d)} (x: Eucl
    (hE: LebesgueMeasurable E): Lebesgue_measure (E + {x}) = Lebesgue_measure E := by
   sorry
 
-/-- Exercise 1.2.21 (Change of variables) -/
+/-- Exercise 1.2.21 (Change of variables, measurability) -/
 lemma LebesgueMeasurable.linear {d:ℕ} (T: EuclideanSpace' d ≃ₗ[ℝ] EuclideanSpace' d)
 {E: Set (EuclideanSpace' d)} (hE: LebesgueMeasurable E): LebesgueMeasurable (T '' E) := by
   sorry
 
-/-- Exercise 1.2.21 (Change of variables) -/
+/-- Exercise 1.2.21 (Change of variables, the measure scales by the determinant) -/
 lemma Lebesgue_measure.linear {d:ℕ} (A: Matrix (Fin d) (Fin d) ℝ) [Invertible A]
  {E: Set (EuclideanSpace' d)} (hE: LebesgueMeasurable E): Lebesgue_measure (A.linear_equiv '' E) = |A.det| * Lebesgue_measure E := by
   sorry
 
-/-- Exercise 1.2.22 -/
+/-- Exercise 1.2.22(i) (Outer measure product bound) -/
 theorem Lebesgue_outer_measure.prod {d₁ d₂:ℕ} {E₁: Set (EuclideanSpace' d₁)} {E₂: Set (EuclideanSpace' d₂)}
   : Lebesgue_outer_measure (EuclideanSpace'.prod E₁ E₂) ≤ Lebesgue_outer_measure E₁ * Lebesgue_outer_measure E₂ := by sorry
 
-/-- Exercise 1.2.22 -/
+/-- Exercise 1.2.22(ii) (Measurability of product) -/
 theorem LebesgueMeasurable.prod {d₁ d₂:ℕ} {E₁: Set (EuclideanSpace' d₁)} {E₂: Set (EuclideanSpace' d₂)}
   (hE₁: LebesgueMeasurable E₁) (hE₂: LebesgueMeasurable E₂) : LebesgueMeasurable (EuclideanSpace'.prod E₁ E₂) := by sorry
 
-/-- Exercise 1.2.22 -/
+/-- Exercise 1.2.22(ii') (Product measure formula) -/
 theorem Lebesgue_measure.prod {d₁ d₂:ℕ} {E₁: Set (EuclideanSpace' d₁)} {E₂: Set (EuclideanSpace' d₂)}
   (hE₁: LebesgueMeasurable E₁) (hE₂: LebesgueMeasurable E₂)
   : Lebesgue_measure (EuclideanSpace'.prod E₁ E₂) = Lebesgue_measure E₁ * Lebesgue_measure E₂ := by sorry
@@ -1767,10 +1772,11 @@ theorem Lebesgue_measure.prod {d₁ d₂:ℕ} {E₁: Set (EuclideanSpace' d₁)}
 theorem Lebesgue_measure.unique {d:ℕ} (m: Set (EuclideanSpace' d) → EReal)
   (h_empty: m ∅ = 0) (h_pos: ∀ E, 0 ≤ m E)
   (h_add: ∀ E: ℕ → Set (EuclideanSpace' d), (Set.univ.PairwiseDisjoint E) → (∀ n, LebesgueMeasurable (E n)) → m (⋃ n, E n) = ∑' n, m (E n))
+  (h_transl: ∀ (x : EuclideanSpace' d) (E : Set (EuclideanSpace' d)), m (E + {x}) = m E)
   (hnorm: m (Box.unit_cube d) = 1)
   : ∀ E, LebesgueMeasurable E → m E = Lebesgue_measure E := by sorry
 
-/-- Exercise 1.2.24(i) (Lebesgue measure as the completion of elementary measure)-/
+/-- Exercise 1.2.24(i) (Lebesgue measure as the completion of elementary measure). -/
 instance IsElementary.ae_equiv {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A):
 Setoid (Set A) := {
    r E F := IsNull (Subtype.val '' (_root_.symmDiff E F))
@@ -1781,10 +1787,9 @@ def IsElementary.ae_subsets {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementa
 
 def IsElementary.ae_quot {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) (E: Set A): hA.ae_subsets := Quotient.mk' (s := hA.ae_equiv) E
 
-/-- Exercise 1.2.24(ii) (Lebesgue measure as the completion of elementary measure)-/
+/-- Exercise 1.2.24(ii) (Lebesgue measure as the completion of elementary measure). -/
 noncomputable def IsElementary.dist {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : hA.ae_subsets → hA.ae_subsets → ℝ := Quotient.lift₂ (fun E F ↦ (Lebesgue_outer_measure (Subtype.val '' (_root_.symmDiff E F))).toReal) (by sorry)
 
-/-- Exercise 1.2.24(ii) (Lebesgue measure as the completion of elementary measure)-/
 noncomputable instance IsElementary.metric {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : MetricSpace hA.ae_subsets := {
     dist := hA.dist
     dist_self := by sorry
@@ -1793,7 +1798,6 @@ noncomputable instance IsElementary.metric {d:ℕ} {A: Set (EuclideanSpace' d)} 
     dist_triangle := by sorry
   }
 
-/-- Exercise 1.2.24(ii) (Lebesgue measure as the completion of elementary measure)-/
 instance IsElementary.complete {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : CompleteSpace hA.ae_subsets := by
   sorry
 
@@ -1801,19 +1805,15 @@ noncomputable def IsElementary.ae_elem {d:ℕ} {A: Set (EuclideanSpace' d)} (hA:
 
 noncomputable def IsElementary.ae_measurable {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : Set hA.ae_subsets := { E | ∃ F: Set A, LebesgueMeasurable (Subtype.val '' F) ∧ hA.ae_quot F = E }
 
-/-- Exercise 1.2.24(iii) (Lebesgue measure as the completion of elementary measure)-/
+/-- Exercise 1.2.24(iii) (Lebesgue measure as the completion of elementary measure). -/
 theorem IsElementary.measurable_eq_closure_elem {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : closure hA.ae_elem = hA.ae_measurable := by
-  sorry
-
-/-- Exercise 1.2.24(c) (Lebesgue measure as the completion of elementary measure)-/
-theorem IsElementary.measurable_complete {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) : closure hA.ae_elem = hA.ae_measurable := by
   sorry
 
 noncomputable def IsElementary.ae_measure {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) (E: hA.ae_measurable) : ℝ := (Lebesgue_measure (Subtype.val '' E.property.choose)).toReal
 
 noncomputable def IsElementary.ae_elem_measure {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) (E: hA.ae_elem) : ℝ := E.property.choose_spec.1.measure
 
-/-- Exercise 1.2.24(iv) (Lebesgue measure as the completion of elementary measure)-/
+/-- Exercise 1.2.24(iv) (Lebesgue measure as the completion of elementary measure). -/
 theorem IsElementary.ae_measure_eq_completion {d:ℕ} {A: Set (EuclideanSpace' d)} (hA: IsElementary A) (m: hA.ae_subsets → ℝ) :
 ContinuousOn m hA.ae_measurable ∧ (∀ (E:hA.ae_elem), m E.val = hA.ae_elem_measure E)
 ↔ (∀ (E:hA.ae_measurable), m E.val = hA.ae_measure E) := by sorry
@@ -1823,7 +1823,7 @@ noncomputable abbrev IsCurve {d:ℕ} (C: Set (EuclideanSpace' d)) : Prop := ∃ 
 /-- Exercise 1.2.25(i) -/
 theorem IsCurve.null {d:ℕ} (hd: d ≥ 2) {C: Set (EuclideanSpace' d)} (hC: IsCurve C) : IsNull C := by sorry
 
-example : ∃ (d:ℕ) (C: Set (EuclideanSpace' d)) (hC: IsCurve C), ¬ IsNull Cx := by
+example : ∃ (d:ℕ) (C: Set (EuclideanSpace' d)) (hC: IsCurve C), ¬ IsNull C := by
   sorry
 
 /-- Exercise 1.2.25 -/

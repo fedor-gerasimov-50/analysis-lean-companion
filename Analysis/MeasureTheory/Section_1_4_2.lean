@@ -12,14 +12,15 @@ class ConcreteSigmaAlgebra (X:Type*) extends ConcreteBooleanAlgebra X where
   countable_union_mem : ∀ E : ℕ → Set X, (∀ n, measurable (E n)) → measurable (⋃ n, E n)
 
 def ConcreteSigmaAlgebra.toMeasurableSpace {X: Type*} (B: ConcreteSigmaAlgebra X) : MeasurableSpace X :=
-  by sorry
+  B.measurableSpace
 
 def MeasurableSpace.toConcreteSigmaAlgebra {X: Type*} (M: MeasurableSpace X) : ConcreteSigmaAlgebra X :=
-  by sorry
+  M.sigmaAlgebra
 
 def ConcreteBooleanAlgebra.isSigmaAlgebra {X: Type*} (B: ConcreteBooleanAlgebra X) : Prop := ∀ E : ℕ → Set X, (∀ n, measurable (E n)) → measurable (⋃ n, E n)
 
-theorem ConcreteSigmaAlgebra.isSigmaAlgebra {X: Type*} (B: ConcreteSigmaAlgebra X) : B.isSigmaAlgebra := by sorry
+theorem ConcreteSigmaAlgebra.isSigmaAlgebra {X: Type*} (B: ConcreteSigmaAlgebra X) : B.isSigmaAlgebra :=
+  B.countable_union_mem
 
 def ConcreteBooleanAlgebra.isSigmaAlgebra.toSigmaAlgebra {X: Type*} {B: ConcreteBooleanAlgebra X} (h: B.isSigmaAlgebra) : ConcreteSigmaAlgebra X :=
   { countable_union_mem := h }
@@ -30,7 +31,7 @@ def ConcreteBooleanAlgebra.isAtomic.isSigmaAlgebra {X: Type*} {B: ConcreteBoolea
 
 /-- Exercise 1.4.11 -/
 theorem LebesgueMeasurable.boolean_algebra.isSigmaAlgebra (d:ℕ) : (LebesgueMeasurable.boolean_algebra d).isSigmaAlgebra :=
-  by sorry
+  fun E hE => LebesgueMeasurable.countable_union hE
 
 def LebesgueMeasurable.sigmaAlgebra (d:ℕ) : ConcreteSigmaAlgebra (EuclideanSpace' d) :=
   (LebesgueMeasurable.boolean_algebra.isSigmaAlgebra d).toSigmaAlgebra
@@ -41,11 +42,18 @@ theorem IsNull.boolean_algebra.isSigmaAlgebra (d:ℕ) : (IsNull.boolean_algebra 
 def IsNull.sigmaAlgebra (d:ℕ) : ConcreteSigmaAlgebra (EuclideanSpace' d) :=
   (IsNull.boolean_algebra.isSigmaAlgebra d).toSigmaAlgebra
 
-theorem JordanMeasurable.boolean_algebra.not_isSigmaAlgebra (d:ℕ) : ¬ (JordanMeasurable.boolean_algebra d).isSigmaAlgebra :=
+theorem JordanMeasurable.boolean_algebra.not_isSigmaAlgebra (d:ℕ) (hd: d ≥ 1) :
+  ¬ (JordanMeasurable.boolean_algebra d).isSigmaAlgebra :=
   by sorry
 
 /-- Exercise 1.4.12 -/
-theorem ConcreteSigmaAlgebra.restrict_is_sigma {X:Type*} (B: ConcreteSigmaAlgebra X) (A:Set X): (B.restrict A).isSigmaAlgebra := by sorry
+theorem ConcreteSigmaAlgebra.restrict_is_sigma {X:Type*} (B: ConcreteSigmaAlgebra X) (A:Set X): (B.restrict A).isSigmaAlgebra := by
+  classical
+  intro E hE
+  choose E' hmeas heq using hE
+  refine ⟨⋃ n, E' n, B.countable_union_mem E' hmeas, ?_⟩
+  ext x
+  simp [heq]
 
 def ConcreteSigmaAlgebra.restrict {X:Type*} (B: ConcreteSigmaAlgebra X) (A:Set X) : ConcreteSigmaAlgebra A := (B.restrict_is_sigma A).toSigmaAlgebra
 
@@ -54,9 +62,16 @@ instance ConcreteSigmaAlgebra.instLE (X:Type*) : LE (ConcreteSigmaAlgebra X) :=
 
 instance ConcreteSigmaAlgebra.instPartialOrder (X:Type*) : PartialOrder (ConcreteSigmaAlgebra X) :=
   {
-    le_refl := sorry
-    le_trans := sorry
-    le_antisymm := sorry
+    le_refl := fun B E hE => hE
+    le_trans := fun A B C hAB hBC E hE => hBC E (hAB E hE)
+    le_antisymm := by
+      intro A B hAB hBA
+      have : A.measurable = B.measurable := by
+        ext E
+        exact ⟨hAB E, hBA E⟩
+      cases A
+      cases B
+      congr
   }
 
 instance ConcreteSigmaAlgebra.instOrderTop {X:Type*} : OrderTop (ConcreteSigmaAlgebra X) :=
@@ -68,7 +83,7 @@ instance ConcreteSigmaAlgebra.instOrderTop {X:Type*} : OrderTop (ConcreteSigmaAl
       union_mem := fun _ _ _ _ => trivial
       countable_union_mem := fun _ _ => trivial
     }
-    le_top := sorry
+    le_top := fun _ _ _ => trivial
   }
 
 instance ConcreteSigmaAlgebra.instOrderBot {X:Type*} : OrderBot (ConcreteSigmaAlgebra X) :=
@@ -78,9 +93,26 @@ instance ConcreteSigmaAlgebra.instOrderBot {X:Type*} : OrderBot (ConcreteSigmaAl
       empty_mem := by grind
       compl_mem := fun E hE => by grind
       union_mem := fun E F hE hF => by grind
-      countable_union_mem := fun E hE => by sorry
+      countable_union_mem := fun E hE => by
+        by_cases h : ∃ n, E n = Set.univ
+        · obtain ⟨n, hn⟩ := h
+          refine Or.inr ?_
+          ext x
+          simp
+          exact ⟨n, by simp [hn]⟩
+        · refine Or.inl ?_
+          ext x
+          simp
+          intro n
+          have hEn := hE n
+          rcases hEn with h0 | h1
+          · simp [h0]
+          · exact (h ⟨n, h1⟩).elim
     }
-    bot_le := sorry
+    bot_le := fun B E hE => by
+      rcases hE with h | h
+      · simpa [h] using B.empty_mem
+      · simpa [h, Set.compl_empty] using B.compl_mem ∅ B.empty_mem
   }
 
 /-- Exercise 1.4.13 (Intersection of sigma-algebras) -/
@@ -89,17 +121,17 @@ instance ConcreteSigmaAlgebra.instInfSet {X:Type*} : InfSet (ConcreteSigmaAlgebr
       sInf S :=
         {
           measurable := fun E => ∀ B ∈ S, B.measurable E
-          empty_mem := by sorry
-          compl_mem := by sorry
-          union_mem := by sorry
-          countable_union_mem := by sorry
+          empty_mem := fun B _ => B.empty_mem
+          compl_mem := fun E hE B hB => B.compl_mem E (hE B hB)
+          union_mem := fun E F hE hF B hB => B.union_mem E F (hE B hB) (hF B hB)
+          countable_union_mem := fun E hE B hB => B.countable_union_mem E (fun n => hE n B hB)
         }
   }
 
 def ConcreteSigmaAlgebra.generated_by {X:Type*} (F: Set (Set X)) : ConcreteSigmaAlgebra X :=
   sInf { B | ∀ E ∈ F, B.measurable E }
 
-/-- Definition 1.4.10 (Generation of algebras) -/
+/-- Definition 1.4.14 (Generation of σ-algebras) -/
 instance ConcreteSigmaAlgebra.instSupSet {X:Type*} : SupSet (ConcreteSigmaAlgebra X) :=
   {
       sSup S := ConcreteSigmaAlgebra.generated_by (⋃ B ∈ S, B.measurableSets)
@@ -117,13 +149,13 @@ instance ConcreteSigmaAlgebra.instCompleteLattice {X:Type*} : CompleteLattice (C
     le_inf := sorry
     le_top := sorry
     bot_le := sorry
-    le_sSup := sorry
-    sSup_le := sorry
-    sInf_le := sorry
-    le_sInf := sorry
+    isLUB_sSup := sorry
+    isGLB_sInf := sorry
   }
 
-theorem ConcreteSigmaAlgebra.generated_by_le {X:Type*} (F: Set (Set X)) : ConcreteBooleanAlgebra.generated_by F ≤ (ConcreteSigmaAlgebra.generated_by F).toConcreteBooleanAlgebra := by sorry
+theorem ConcreteSigmaAlgebra.generated_by_le {X:Type*} (F: Set (Set X)) : ConcreteBooleanAlgebra.generated_by F ≤ (ConcreteSigmaAlgebra.generated_by F).toConcreteBooleanAlgebra := by
+  intro E hE B hB
+  exact hE B.toConcreteBooleanAlgebra fun A hA => hB A hA
 
 example : ∃ (X:Type*) (F: Set (Set X)), ConcreteBooleanAlgebra.generated_by F ≠ (ConcreteSigmaAlgebra.generated_by F).toConcreteBooleanAlgebra := by sorry
 
@@ -146,7 +178,7 @@ theorem BorelSigmaAlgebra.generated_by_closed (d:ℕ) : BorelSigmaAlgebra (Eucli
 /-- Exercise 1.4.14 (iii) -/
 theorem BorelSigmaAlgebra.generated_by_compact (d:ℕ) : BorelSigmaAlgebra (EuclideanSpace' d) = ConcreteSigmaAlgebra.generated_by { K : Set (EuclideanSpace' d) | IsCompact K } := by sorry
 
-/-- Exercise 1.4.15 (iv) -/
+/-- Exercise 1.4.14 (iv) -/
 theorem BorelSigmaAlgebra.generated_by_open_balls (d:ℕ) : BorelSigmaAlgebra (EuclideanSpace' d) = ConcreteSigmaAlgebra.generated_by { B : Set (EuclideanSpace' d) | ∃ x₀ r, B = Metric.ball x₀ r } := by sorry
 
 /-- Exercise 1.4.14 (v) -/
@@ -156,11 +188,11 @@ theorem BorelSigmaAlgebra.generated_by_boxes (d:ℕ) : BorelSigmaAlgebra (Euclid
 theorem BorelSigmaAlgebra.generated_by_elementary (d:ℕ) : BorelSigmaAlgebra (EuclideanSpace' d) = ConcreteSigmaAlgebra.generated_by { E : Set (EuclideanSpace' d) | IsElementary E }  := by sorry
 
 open Ordinal in
-/-- Exercise 1.4.15 (Recursive definition of generated sigma-algebra)-/
+/-- Exercise 1.4.15 (Recursive definition of generated sigma-algebra). -/
 def ConcreteSigmaAlgebra.generated_by_eq {X:Type*} (F: Set (Set X)) :
   (ConcreteSigmaAlgebra.generated_by F).measurableSets =
   ⋃ α < ω₁,
-  Ordinal.limitRecOn (motive := fun _ ↦ Set (Set X)) α F (fun n G ↦ { E: Set X | (∃ S: Set G, Countable S ∧ E = ⋃ (H:S), H) ∨ (∃ S: Set G, Countable S ∧ E = (⋃ (H:S), H))ᶜ }) (fun α _ G ↦ ⋃ (β : Ordinal) (h : β < α), G β h) := by sorry
+  Ordinal.limitRecOn (motive := fun _ ↦ Set (Set X)) α F (fun n G ↦ { E: Set X | (∃ S: Set G, Countable S ∧ E = ⋃ (H:S), H) ∨ (∃ S: Set G, Countable S ∧ E = (⋃ (H:S), H)ᶜ) }) (fun α _ G ↦ ⋃ (β : Ordinal) (h : β < α), G β h) := by sorry
 
 open Cardinal in
 /-- Exercise 1.4.16 -/
@@ -183,7 +215,7 @@ theorem BorelSigmaAlgebra.prod {d₁ d₂:ℕ} {E : Set (EuclideanSpace' d₁)} 
   :=
   by sorry
 
-/-- Exercise 1.4.18(i) -/
+/-- Exercise 1.4.18(i) (slice along first factor). -/
 theorem BorelSigmaAlgebra.slice_fst {d₁ d₂:ℕ} {E : Set (EuclideanSpace' (d₁+d₂))}
   (hE: (BorelSigmaAlgebra (EuclideanSpace' (d₁+d₂))).measurable E)
   (x₂ : EuclideanSpace' d₂ ) :
@@ -191,7 +223,7 @@ theorem BorelSigmaAlgebra.slice_fst {d₁ d₂:ℕ} {E : Set (EuclideanSpace' (d
   :=
   by sorry
 
-/-- Exercise 1.4.18(i) -/
+/-- Exercise 1.4.18(i) (slice along second factor). -/
 theorem BorelSigmaAlgebra.slice_snd {d₁ d₂:ℕ} {E : Set (EuclideanSpace' (d₁+d₂))}
   (hE: (BorelSigmaAlgebra (EuclideanSpace' (d₁+d₂))).measurable E)
   (x₁ : EuclideanSpace' d₁ ) :
@@ -200,9 +232,8 @@ theorem BorelSigmaAlgebra.slice_snd {d₁ d₂:ℕ} {E : Set (EuclideanSpace' (d
   by sorry
 
 /-- Exercise 1.4.18(ii) -/
-example (d₁ d₂ :ℕ) (E : Set (EuclideanSpace' (d₁+d₂)))
-  (hE: LebesgueMeasurable E)
-  (x₂ : EuclideanSpace' d₂ ) :
+example : ∃ (d₁ d₂ : ℕ) (E : Set (EuclideanSpace' (d₁+d₂))) (x₂ : EuclideanSpace' d₂),
+  LebesgueMeasurable E ∧
   ¬ LebesgueMeasurable { x₁ | (EuclideanSpace'.prod_equiv d₁ d₂).symm ⟨ x₁, x₂ ⟩ ∈ E } := by sorry
 
 /-- Exercise 1.4.19 -/
@@ -221,8 +252,26 @@ def MeasurableSpace.sigmaAlgebra {X: Type*} (M: MeasurableSpace X) : ConcreteSig
   measurable := M.MeasurableSet'
   empty_mem := M.measurableSet_empty
   compl_mem := M.measurableSet_compl
-  union_mem := sorry
+  union_mem := fun E F hE hF => by
+    have hunion : E ∪ F = ⋃ n, if n = 0 then E else F := by
+      ext x
+      simp only [Set.mem_union, Set.mem_iUnion]
+      constructor
+      · rintro (hx | hx)
+        · exact ⟨0, by simp [hx]⟩
+        · exact ⟨1, by simp [hx]⟩
+      · rintro ⟨n, hx⟩
+        by_cases hn : n = 0
+        · exact Or.inl (by simpa [hn] using hx)
+        · exact Or.inr (by simpa [hn] using hx)
+    rw [hunion]
+    exact M.measurableSet_iUnion _ (fun n => by
+      by_cases hn : n = 0
+      · simpa [hn] using hE
+      · simpa [hn] using hF)
   countable_union_mem := M.measurableSet_iUnion
 }
 
-theorem BorelSigmaAlgebra.le_LebesgueSigmaAlgebra (d:ℕ) : BorelSigmaAlgebra (EuclideanSpace' d) ≤ LebesgueMeasurable.sigmaAlgebra d := by sorry
+theorem BorelSigmaAlgebra.le_LebesgueSigmaAlgebra (d:ℕ) : BorelSigmaAlgebra (EuclideanSpace' d) ≤ LebesgueMeasurable.sigmaAlgebra d := by
+  intro E hE
+  exact hE (LebesgueMeasurable.sigmaAlgebra d) fun U hU => IsOpen.measurable hU

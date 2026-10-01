@@ -41,16 +41,16 @@ example : ¬ IsMinOn f_10_2_3 .univ 0 := by sorry
 
 example : IsMinOn f_10_2_3 (.Ioo (-1) 1) 0 := by sorry
 
-example : IsLocalMaxOn f_10_2_3 .univ 0 := by sorry
+example : IsLocalMinOn f_10_2_3 .univ 0 := by sorry
 
 /-- Example 10.2.4 -/
 example : ¬ ∃ x, IsMaxOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) x := by sorry
 
 example : ¬ ∃ x, IsMinOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) x := by sorry
 
-example (n:ℤ) : IsMaxOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) n := by sorry
+example (n:ℤ) : IsLocalMaxOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) n := by sorry
 
-example (n:ℤ) : IsMinOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) n := by sorry
+example (n:ℤ) : IsLocalMinOn (· : ℝ → ℝ)  ((↑· : ℤ → ℝ) '' .univ) n := by sorry
 
 /-- Remark 10.2.5 -/
 theorem IsLocalMaxOn.of_restrict {X Y:Set ℝ} (hXY: Y ⊆ X) (f:ℝ → ℝ) (x₀:ℝ)
@@ -61,19 +61,19 @@ theorem IsLocalMinOn.of_restrict {X Y:Set ℝ} (hXY: Y ⊆ X) (f:ℝ → ℝ) (x
   (h: IsLocalMinOn f X x₀) : IsLocalMinOn f Y x₀ := by
   sorry
 
-/-- Proposition 10.2.6 (Local extrema are stationary) / Exercise 10.2.1 -/
-theorem IsLocalMaxOn.deriv_eq_zero {a b:ℝ} (hab: a < b) {f:ℝ → ℝ} {x₀:ℝ}
+/-- Proposition 10.2.6 (i) (Local extrema are stationary) / Exercise 10.2.1 -/
+theorem IsLocalMaxOn.deriv_eq_zero {a b:ℝ} {f:ℝ → ℝ} {x₀:ℝ}
   (hx₀: x₀ ∈ Set.Ioo a b) (h: IsLocalMaxOn f (.Ioo a b) x₀) {L:ℝ}
   (hderiv: HasDerivWithinAt f L (.Ioo a b) x₀) : L = 0 := by
   sorry
 
-/-- Proposition 10.2.6 (Local extrema are stationary) / Exercise 10.2.1 -/
-theorem IsLocalMinOn.deriv_eq_zero {a b:ℝ} (hab: a < b) {f:ℝ → ℝ} {x₀:ℝ}
+/-- Proposition 10.2.6 (ii) (Local extrema are stationary) / Exercise 10.2.1 -/
+theorem IsLocalMinOn.deriv_eq_zero {a b:ℝ} {f:ℝ → ℝ} {x₀:ℝ}
   (hx₀: x₀ ∈ Set.Ioo a b) (h: IsLocalMinOn f (.Ioo a b) x₀) {L:ℝ}
   (hderiv: HasDerivWithinAt f L (.Ioo a b) x₀) : L = 0 := by
   sorry
 
-theorem IsMaxOn.deriv_eq_zero_counter : ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ)
+theorem IsMaxOn.deriv_eq_zero_counter : ∃ (a b:ℝ) (f:ℝ → ℝ)
   (x₀:ℝ) (hx₀: x₀ ∈ Set.Icc a b) (h: IsMaxOn f (.Icc a b) x₀) (L:ℝ)
   (hderiv: HasDerivWithinAt f L (.Icc a b) x₀), L ≠ 0 := by
   sorry
@@ -84,7 +84,7 @@ theorem _root_.HasDerivWithinAt.exist_zero {a b:ℝ} (hab: a < b) {g:ℝ → ℝ
   (hgab: g a = g b) : ∃ x ∈ Set.Ioo a b, HasDerivWithinAt g 0 (.Ioo a b) x := by
   sorry
 
-/-- Corollary 10.2.9 (Mean value theorem ) / Exercise 10.2.5 -/
+/-- Corollary 10.2.9 (Mean value theorem) / Exercise 10.2.5 -/
 theorem _root_.HasDerivWithinAt.mean_value {a b:ℝ} (hab: a < b) {f:ℝ → ℝ}
   (hcont: ContinuousOn f (.Icc a b)) (hderiv: DifferentiableOn ℝ f (.Ioo a b)) :
   ∃ x ∈ Set.Ioo a b, HasDerivWithinAt f ((f b - f a) / (b - a)) (.Ioo a b) x := by
@@ -106,7 +106,7 @@ theorem lipschitz_bound {M a b:ℝ} (hM: M > 0) (hab: a < b) {f:ℝ → ℝ}
   (hcont: ContinuousOn f (.Icc a b))
   (hderiv: DifferentiableOn ℝ f (.Ioo a b))
   (hlip: ∀ x ∈ Set.Ioo a b, |derivWithin f (.Ioo a b) x| ≤ M)
-  {x y:ℝ} (hx: x ∈ Set.Ioo a b) (hy: y ∈ Set.Ioo a b) :
+  {x y:ℝ} (hx: x ∈ Set.Icc a b) (hy: y ∈ Set.Icc a b) :
   |f x - f y| ≤ M * |x - y| := by
   sorry
 

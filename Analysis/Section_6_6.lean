@@ -20,7 +20,7 @@ namespace Chapter6
 /-- Definition 6.6.1 -/
 abbrev Sequence.subseq (a b: ℕ → ℝ) : Prop := ∃ f : ℕ → ℕ, StrictMono f ∧ ∀ n, b n = a (f n)
 
-/- Example 6.6.2 -/
+/-- Example 6.6.2 -/
 example (a:ℕ → ℝ) : Sequence.subseq a (fun n ↦ a (2 * n)) := by sorry
 
 example {f: ℕ → ℕ} (hf: StrictMono f) : Function.Injective f := by sorry
@@ -35,10 +35,10 @@ example :
     (fun n ↦ (10:ℝ)^(-(n:ℤ)-1)) := by
   sorry
 
-/-- Lemma 6.6.4 / Exercise 6.6.1 -/
+/-- Lemma 6.6.4 (reflexivity) / Exercise 6.6.1 -/
 theorem Sequence.subseq_self (a:ℕ → ℝ) : Sequence.subseq a a := by sorry
 
-/-- Lemma 6.6.4 / Exercise 6.6.1 -/
+/-- Lemma 6.6.4 (transitivity) / Exercise 6.6.1 -/
 theorem Sequence.subseq_trans {a b c:ℕ → ℝ} (hab: Sequence.subseq a b) (hbc: Sequence.subseq b c) :
     Sequence.subseq a c := by sorry
 
@@ -60,8 +60,7 @@ theorem Sequence.convergent_of_subseq_of_bounded {a:ℕ→ ℝ} (ha: (a:Sequence
   have := limit_point_of_limsup hL_plus
   rw [limit_point_iff_subseq] at this; peel 2 this; solve_by_elim
 
-/- Exercise 6.6.2 -/
-
+/-- Exercise 6.6.2 -/
 def Sequence.exist_subseq_of_subseq :
   Decidable (∃ a b : ℕ → ℝ, a ≠ b ∧ Sequence.subseq a b ∧ Sequence.subseq b a) := by
     -- The first line of this construction should be `apply isTrue` or `apply isFalse`.

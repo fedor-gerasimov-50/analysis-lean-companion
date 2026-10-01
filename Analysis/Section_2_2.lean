@@ -24,7 +24,8 @@ standard Mathlib class {name}`_root_.Nat`, or {lean}`ℕ`.  However, we will dev
 
 ## Tips from past users
 
-Users of the companion who have completed the exercises in this section are welcome to send their tips for future users in this section as PRs.
+Users of the companion who have completed the exercises in this section are welcome to send their
+tips for future users in this section as PRs.
 
 - (Add tip here)
 
@@ -36,9 +37,9 @@ namespace Chapter2
     Compare with Mathlib's {name}`Nat.add` -/
 abbrev Nat.add (n m : Nat) : Nat := Nat.recurse (fun _ sum ↦ sum++) m n
 
-/-- This instance allows for the {kw (of := «term_+_»)}`+` notation to be used for natural number addition. -/
-instance Nat.instAdd : Add Nat where
-  add := add
+/-- This instance allows for the {kw (of := «term_+_»)}`+` notation to be used for natural number
+    addition. -/
+instance Nat.instAdd : Add Nat where add := add
 
 /-- Compare with Mathlib's {name}`Nat.zero_add`. -/
 @[simp]
@@ -113,7 +114,7 @@ theorem Nat.add_left_cancel (a b c:Nat) (habc: a + b = a + c) : b = c := by
 
 
 /-- (Not from textbook) {name}`Nat` can be given the structure of a commutative additive monoid.
-This permits tactics such as {tactic}`abel` to apply to the Chapter 2 natural numbers. -/
+    This permits tactics such as {tactic}`abel` to apply to the Chapter 2 natural numbers. -/
 instance Nat.addCommMonoid : AddCommMonoid Nat where
   add_assoc := add_assoc
   add_comm := add_comm
@@ -125,7 +126,7 @@ instance Nat.addCommMonoid : AddCommMonoid Nat where
     textbook. -/
 example (a b c d:Nat) : (a+b)+(c+0+d) = (b+c)+(d+a) := by abel
 
-/-- Definition 2.2.7 (Positive natural numbers).-/
+/-- Definition 2.2.7 (Positive natural numbers). -/
 def Nat.IsPos (n:Nat) : Prop := n ≠ 0
 
 theorem Nat.isPos_iff (n:Nat) : n.IsPos ↔ n ≠ 0 := by rfl
@@ -143,8 +144,8 @@ theorem Nat.add_pos_left {a:Nat} (b:Nat) (ha: a.IsPos) : (a + b).IsPos := by
 
 /-- Compare with Mathlib's {name}`Nat.add_pos_right`.
 
-This theorem is a consequence of the previous theorem and {name}`add_comm`, and {tactic}`grind` can automatically discover such proofs.
--/
+This theorem is a consequence of the previous theorem and {name}`add_comm`, and {tactic}`grind` can
+automatically discover such proofs. -/
 theorem Nat.add_pos_right {a:Nat} (b:Nat) (ha: a.IsPos) : (b + a).IsPos := by
   grind [add_comm, add_pos_left]
 
@@ -224,7 +225,7 @@ theorem Nat.succ_gt_self (n:Nat) : n++ > n := by
 
 /-- Proposition 2.2.12 (Basic properties of order for natural numbers) / Exercise 2.2.3
 
-(a) (Order is reflexive). Compare with Mathlib's {name}`Nat.le_refl`.-/
+(a) (Order is reflexive). Compare with Mathlib's {name}`Nat.le_refl`. -/
 theorem Nat.ge_refl (a:Nat) : a ≥ a := by
   sorry
 
@@ -245,19 +246,19 @@ theorem Nat.le_trans {a b c:Nat} (hab: a ≤ b) (hbc: b ≤ c) : a ≤ c := Nat.
 theorem Nat.ge_antisymm {a b:Nat} (hab: a ≥ b) (hba: b ≥ a) : a = b := by
   sorry
 
-/-- (d) (Addition preserves order).  Compare with Mathlib's {name}`Nat.add_le_add_right`. -/
+/-- (d) (Addition preserves order, ≥).  Compare with Mathlib's {name}`Nat.add_le_add_right`. -/
 theorem Nat.add_ge_add_right (a b c:Nat) : a ≥ b ↔ a + c ≥ b + c := by
   sorry
 
-/-- (d) (Addition preserves order).  Compare with Mathlib's {name}`Nat.add_le_add_left`.  -/
+/-- (d) (Addition preserves order, ≥).  Compare with Mathlib's {name}`Nat.add_le_add_left`.  -/
 theorem Nat.add_ge_add_left (a b c:Nat) : a ≥ b ↔ c + a ≥ c + b := by
   simp only [add_comm]
   exact add_ge_add_right _ _ _
 
-/-- (d) (Addition preserves order).  Compare with Mathlib's {name}`Nat.add_le_add_right`.  -/
+/-- (d) (Addition preserves order, ≤).  Compare with Mathlib's {name}`Nat.add_le_add_right`.  -/
 theorem Nat.add_le_add_right (a b c:Nat) : a ≤ b ↔ a + c ≤ b + c := add_ge_add_right _ _ _
 
-/-- (d) (Addition preserves order).  Compare with Mathlib's {name}`Nat.add_le_add_left`.  -/
+/-- (d) (Addition preserves order, ≤).  Compare with Mathlib's {name}`Nat.add_le_add_left`.  -/
 theorem Nat.add_le_add_left (a b c:Nat) : a ≤ b ↔ c + a ≤ c + b := add_ge_add_left _ _ _
 
 /-- (e) a < b iff a++ ≤ b.  Compare with Mathlib's {name}`Nat.succ_le_iff`. -/
@@ -268,7 +269,7 @@ theorem Nat.lt_iff_succ_le (a b:Nat) : a < b ↔ a++ ≤ b := by
 theorem Nat.lt_iff_add_pos (a b:Nat) : a < b ↔ ∃ d:Nat, d.IsPos ∧ b = a + d := by
   sorry
 
-/-- If a < b then a ̸= b,-/
+/-- If a < b then a ̸= b, -/
 theorem Nat.ne_of_lt (a b:Nat) : a < b → a ≠ b := by
   intro h; exact h.2
 
@@ -320,10 +321,10 @@ theorem Nat.trichotomous (a b:Nat) : a < b ∨ a = b ∨ a > b := by
   tauto
 
 /--
-  (Not from textbook) Establish the decidability of this order computably.  The portion of the
-  proof involving decidability has been provided; the remaining sorries involve claims about the
-  natural numbers.  One could also have established this result by the {tactic}`classical` tactic
-  followed by {syntax tactic}`exact Classical.decRel _`, but this would make this definition (as well as some
+  (Not from textbook) Establish the decidability of this order computably.  The portion of the proof
+  involving decidability has been provided; the remaining sorries involve claims about the natural
+  numbers.  One could also have established this result by the {tactic}`classical` tactic followed
+  by {syntax tactic}`exact Classical.decRel _`, but this would make this definition (as well as some
   instances below) noncomputable.
 
   Compare with Mathlib's {name}`Nat.decLe`.
@@ -376,7 +377,8 @@ instance Nat.instLinearOrder : LinearOrder Nat where
 example (a b c d:Nat) (hab: a ≤ b) (hbc: b ≤ c) (hcd: c ≤ d)
         (hda: d ≤ a) : a = c := by order
 
-/-- An illustration of the {tactic}`calc` tactic with {kw (of := «term_≤_»)}`≤`/{kw (of := «term_<_»)}`<`. -/
+/-- An illustration of the {tactic}`calc` tactic with {kw (of := «term_≤_»)}`≤`/
+    {kw (of :=«term_<_»)}`<`. -/
 example (a b c d e:Nat) (hab: a ≤ b) (hbc: b < c) (hcd: c ≤ d)
         (hde: d ≤ e) : a + 0 < e := by
   calc
@@ -387,7 +389,7 @@ example (a b c d e:Nat) (hab: a ≤ b) (hbc: b < c) (hcd: c ≤ d)
         _ ≤ e := hde
 
 /-- (Not from textbook) {name}`Nat` has the structure of an ordered monoid. This allows for tactics
-such as {tactic}`gcongr` to be applicable to the Chapter 2 natural numbers. -/
+    such as {tactic}`gcongr` to be applicable to the Chapter 2 natural numbers. -/
 instance Nat.isOrderedAddMonoid : IsOrderedAddMonoid Nat where
   add_le_add_left a b hab c := (Nat.add_le_add_right a b c).mp hab
 
@@ -419,6 +421,5 @@ theorem Nat.induction_from {n:Nat} {P: Nat → Prop} (hind: ∀ m, P m → P (m+
     P n → ∀ m, m ≥ n → P m := by
   sorry
 
-
-
 end Chapter2
+

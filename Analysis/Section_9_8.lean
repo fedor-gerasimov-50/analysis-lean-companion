@@ -72,7 +72,7 @@ theorem MonotoneOn.exist_inverse {a b:ℝ} (h: a < b) (f: ℝ → ℝ) (hcont: C
    := by
   sorry
 
-/-- Example 9.8.4-/
+/-- Example 9.8.4 -/
 example {R :ℝ} (hR: R > 0) {n:ℕ} (hn: n > 0) : ∃ g : ℝ → ℝ, ∀ x ∈ Set.Icc 0 (R^n), (g x)^n = x := by
   set f : ℝ → ℝ := fun x ↦ x^n
   have hcont : ContinuousOn f (.Icc 0 R) := by fun_prop
@@ -107,13 +107,25 @@ theorem BddOn.of_antitone {a b:ℝ} {f:ℝ → ℝ} (hf: AntitoneOn f (.Icc a b)
 
 
 /-- Exercise 9.8.2 -/
-theorem no_strictmono_intermediate_value : ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: StrictMonoOn f (.Icc a b)), ¬ ∃ y, y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f a) (f b) := by sorry
+theorem no_strictmono_intermediate_value :
+    ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: StrictMonoOn f (.Icc a b)),
+      ∃ y, (y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f b) (f a)) ∧
+      ¬ ∃ c ∈ Set.Icc a b, f c = y := by sorry
 
-theorem no_monotone_intermediate_value : ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: MonotoneOn f (.Icc a b)), ¬ ∃ y, y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f a) (f b) := by sorry
+theorem no_monotone_intermediate_value :
+    ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: MonotoneOn f (.Icc a b)),
+      ∃ y, (y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f b) (f a)) ∧
+      ¬ ∃ c ∈ Set.Icc a b, f c = y := by sorry
 
-theorem no_strictanti_intermediate_value : ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: StrictAntiOn f (.Icc a b)), ¬ ∃ y, y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f a) (f b) := by sorry
+theorem no_strictanti_intermediate_value :
+    ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: StrictAntiOn f (.Icc a b)),
+      ∃ y, (y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f b) (f a)) ∧
+      ¬ ∃ c ∈ Set.Icc a b, f c = y := by sorry
 
-theorem no_antitone_intermediate_value : ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: AntitoneOn f (.Icc a b)), ¬ ∃ y, y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f a) (f b) := by sorry
+theorem no_antitone_intermediate_value :
+    ∃ (a b:ℝ) (hab: a < b) (f:ℝ → ℝ) (hf: AntitoneOn f (.Icc a b)),
+      ∃ y, (y ∈ Set.Icc (f a) (f b) ∨ y ∈ Set.Icc (f b) (f a)) ∧
+      ¬ ∃ c ∈ Set.Icc a b, f c = y := by sorry
 
 /-- Exercise 9.8.3 -/
 theorem mono_of_continuous_inj {a b:ℝ} (h: a < b) {f:ℝ → ℝ}
@@ -122,31 +134,34 @@ theorem mono_of_continuous_inj {a b:ℝ} (h: a < b) {f:ℝ → ℝ}
   StrictMonoOn f (.Icc a b) ∨ StrictAntiOn f (.Icc a b) := by
   sorry
 
-/-- Exercise 9.8.4 -/
-def MonotoneOn.exist_inverse_without_continuity {a b:ℝ} (h: a < b) {f: ℝ → ℝ} (hmono: StrictMonoOn f (.Icc a b)) :
-  Decidable ( f '' (.Icc a b) = .Icc (f a) (f b) ∧
-  ∃ finv: ℝ → ℝ, ContinuousOn finv (.Icc (f a) (f b)) ∧ StrictMonoOn finv (.Icc (f a) (f b)) ∧
-  finv '' (.Icc (f a) (f b)) = .Icc a b ∧
-  (∀ x ∈ Set.Icc a b, finv (f x) = x) ∧
-  ∀ y ∈ Set.Icc (f a) (f b), f (finv y) = y )
-   := by
-  -- the first line of this construction should be either `apply isTrue` or `apply isFalse`.
+/-- Exercise 9.8.4 (without continuity) -/
+def MonotoneOn.exist_inverse_without_continuity :
+    Decidable (∀ (a b : ℝ) (_ : a < b) (f : ℝ → ℝ) (_ : StrictMonoOn f (.Icc a b)),
+      f '' (.Icc a b) = .Icc (f a) (f b) ∧
+      ∃ finv : ℝ → ℝ, ContinuousOn finv (.Icc (f a) (f b)) ∧ StrictMonoOn finv (.Icc (f a) (f b)) ∧
+        finv '' (.Icc (f a) (f b)) = .Icc a b ∧
+        (∀ x ∈ Set.Icc a b, finv (f x) = x) ∧
+        ∀ y ∈ Set.Icc (f a) (f b), f (finv y) = y) := by
+  -- apply isFalse: strict mono alone doesn't guarantee a continuous inverse
   sorry
 
-/-- Exercise 9.8.4 -/
-def MonotoneOn.exist_inverse_without_strictmono {a b:ℝ} (h: a < b) (f: ℝ → ℝ)
-  (hcont: ContinuousOn f (.Icc a b)) (hmono: MonotoneOn f (.Icc a b)) :
-  Decidable ( f '' (.Icc a b) = .Icc (f a) (f b) ∧
-  ∃ finv: ℝ → ℝ, ContinuousOn finv (.Icc (f a) (f b)) ∧ StrictMonoOn finv (.Icc (f a) (f b)) ∧
-  finv '' (.Icc (f a) (f b)) = .Icc a b ∧
-  (∀ x ∈ Set.Icc a b, finv (f x) = x) ∧
-  ∀ y ∈ Set.Icc (f a) (f b), f (finv y) = y )
-   := by
-  -- the first line of this construction should be either `apply isTrue` or `apply isFalse`.
+/-- Exercise 9.8.4 (without strict monotonicity) -/
+def MonotoneOn.exist_inverse_without_strictmono :
+    Decidable (∀ (a b : ℝ) (_ : a < b) (f : ℝ → ℝ) (_ : ContinuousOn f (.Icc a b))
+        (_ : MonotoneOn f (.Icc a b)),
+      f '' (.Icc a b) = .Icc (f a) (f b) ∧
+      ∃ finv : ℝ → ℝ, ContinuousOn finv (.Icc (f a) (f b)) ∧ StrictMonoOn finv (.Icc (f a) (f b)) ∧
+        finv '' (.Icc (f a) (f b)) = .Icc a b ∧
+        (∀ x ∈ Set.Icc a b, finv (f x) = x) ∧
+        ∀ y ∈ Set.Icc (f a) (f b), f (finv y) = y) := by
+  -- apply isFalse: e.g. a constant monotone f on [a,b] has no strict inverse
   sorry
 
 
-/- Exercise 9.8.4: state and prove an analogue of `MonotoneOne.exist_inverse` for `Antitone` functions. -/
+/-
+Exercise 9.8.4: state and prove an analogue of `MonotoneOn.exist_inverse` for `Antitone`
+functions.
+-/
 -- theorem AntitoneOn.exist_inverse {a b:ℝ} (h: a < b) (f: ℝ → ℝ) (hcont: ContinuousOn f (.Icc a b)) (hmono: StrictAntiOn f (.Icc a b)) : sorry := by sorry
 
 /-- An equivalence between the natural numbers and the rationals. -/
